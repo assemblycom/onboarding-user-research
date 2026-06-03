@@ -33,6 +33,8 @@
     '.asm-sb .nav-item svg{color:var(--muted);flex-shrink:0;}' +
     '.asm-sb .nav-item .ic,.asm-sb .ws-caret-img,.asm-sb .checklist-item .ic{display:block;flex-shrink:0;}' +
     '.asm-sb .nav-item.add{color:var(--muted);}' +
+    '.asm-sb .nav-item.draft .draft-label{flex:1;}' +
+    '.asm-sb .draft-badge{font-size:11px;font-weight:400;color:var(--muted);background:#f0f1f3;border-radius:5px;padding:1px 7px;}' +
     '.asm-sb .spacer{flex:1;}' +
     '.asm-sb .checklist{border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px;}' +
     '.asm-sb .checklist-title{font-size:12.5px;font-weight:600;margin-bottom:10px;}' +
@@ -56,6 +58,10 @@
   }
 
   var BELL = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#212B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+  var CLOCK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#212B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>';
+
+  // The app being built shows as a Draft entry under the Apps group.
+  var DRAFT_APP = 'Time tracker';
 
   function buildHTML() {
     var co = company();
@@ -71,7 +77,8 @@
         '<div class="nav-group-label">Apps</div>' +
         '<a class="nav-item" data-nav="home.html"><img class="ic" src="assets/home.svg" alt="" width="18" height="18" />Home</a>' +
         '<a class="nav-item" data-nav="messages.html"><img class="ic" src="assets/message.svg" alt="" width="18" height="18" />Messages</a>' +
-        '<a class="nav-item add active"><img class="ic" src="assets/pls.svg" alt="" width="15" height="15" />Add app</a>' +
+        '<a class="nav-item draft active">' + CLOCK + '<span class="draft-label">' + DRAFT_APP + '</span><span class="draft-badge">Draft</span></a>' +
+        '<a class="nav-item add" data-nav="studio.html"><img class="ic" src="assets/pls.svg" alt="" width="15" height="15" />Add app</a>' +
         '<div class="nav-group-label">Customize</div>' +
         '<a class="nav-item" data-nav="brand.html"><img class="ic" src="assets/brand.svg" alt="" width="18" height="18" />Brand</a>' +
         '<a class="nav-item" data-nav="studio.html"><img class="ic" src="assets/apps.svg" alt="" width="18" height="18" />Apps</a>' +
