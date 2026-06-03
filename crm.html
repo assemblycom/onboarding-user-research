@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Assembly Studio — CRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --text: #212b36;
+      --muted: #6b6f76;
+      --border: #dfe1e4;
+      --bg-soft: #f8f9fb;
+      --bg-hover: #eff1f4;
+      --dark: #1a1a1a;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: var(--text); background: #fff; -webkit-font-smoothing: antialiased; }
+    .shell { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── Sidebar (shared) ── */
+    .sidebar { width: 248px; flex-shrink: 0; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 14px 12px; gap: 4px; }
+    .ws { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; cursor: pointer; }
+    .ws:hover { background: var(--bg-hover); }
+    .ws-avatar { width: 26px; height: 26px; border-radius: 7px; background: #f4f5f7; border: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #1f1f1f; font-size: 13px; font-weight: 600; }
+    .ws-name { font-weight: 600; font-size: 14px; flex: 1; }
+    .nav { display: flex; flex-direction: column; gap: 1px; margin-top: 8px; }
+    .nav-group-label { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); padding: 14px 8px 5px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; font-size: 13.5px; color: var(--text); cursor: pointer; text-decoration: none; }
+    .nav-item:hover { background: var(--bg-hover); }
+    .nav-item.active { background: var(--bg-hover); font-weight: 500; }
+    .nav-item svg { color: var(--muted); flex-shrink: 0; }
+    .nav-item .ic, .ws-caret-img, .checklist-item .ic { display: block; flex-shrink: 0; }
+    .nav-item.add { color: var(--muted); }
+    .spacer { flex: 1; }
+    .checklist { border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-top: 10px; }
+    .checklist-title { font-size: 12.5px; font-weight: 600; margin-bottom: 10px; }
+    .checklist-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 12.5px; color: var(--muted); }
+    .checklist-item.active { color: var(--text); font-weight: 500; }
+    .sidebar-foot { display: flex; align-items: center; justify-content: space-between; padding: 12px 4px 2px; }
+    .foot-actions { display: flex; align-items: center; gap: 8px; }
+    .sidebar-foot .icon-btn { display: flex; align-items: center; justify-content: center; padding: 7px; border: 1px solid var(--border); background: #fff; border-radius: 999px; cursor: pointer; transition: background 0.12s; }
+    .sidebar-foot .icon-btn:hover { background: var(--bg-hover); }
+    .sidebar-foot .open-portal { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px; border: 1px solid var(--border); background: #fff; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; font-family: inherit; transition: background 0.12s; }
+    .sidebar-foot .open-portal:hover { background: var(--bg-hover); }
+
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    .crm-top { display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; border-bottom: 1px solid var(--border); gap: 16px; }
+    .crm-title { font-size: 18px; font-weight: 600; }
+    .crm-actions { display: flex; gap: 8px; }
+    .btn { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--border); background: #fff; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; font-family: inherit; transition: background 0.12s; white-space: nowrap; }
+    .btn:hover { background: var(--bg-hover); }
+    .btn svg { width: 14px; height: 14px; color: var(--muted); }
+    .btn-dark { background: var(--dark); border-color: var(--dark); color: #fff; }
+    .btn-dark svg { color: #fff; }
+    .btn-dark:hover { background: #000; }
+
+    .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border); margin-top: 6px; padding: 0 28px; }
+    .tab { padding: 10px 2px; font-size: 14px; color: var(--muted); cursor: pointer; border-bottom: 1px solid transparent; margin-bottom: -1px; }
+    .tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--dark); }
+
+    .table-wrap { padding: 0 28px; }
+    .crm-table { width: 100%; border-collapse: collapse; }
+    .crm-table th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); padding: 14px 12px; border-bottom: 1px solid var(--border); }
+    .crm-table th .info { display: inline-flex; vertical-align: middle; margin-left: 4px; color: #b3b8bf; }
+    .crm-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); font-size: 13.5px; color: var(--text); }
+    .crm-table tbody tr:hover { background: var(--bg-soft); }
+    .crm-table .col-actions { width: 40px; text-align: right; }
+
+    .cell-name { display: flex; align-items: center; gap: 11px; }
+    .cell-name .avatar { width: 28px; height: 28px; border-radius: 50%; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cell-name .nm { font-weight: 500; line-height: 1.3; }
+    .cell-name .em { font-size: 12px; color: var(--muted); line-height: 1.3; }
+
+    .cell-co { display: flex; align-items: center; gap: 9px; }
+    .cell-co .co-ic { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cell-co .co-ic svg { width: 13px; height: 13px; color: #fff; }
+
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+    .badge-inactive { background: #fbf0cf; color: #8a6d1f; }
+
+    .date { color: var(--muted); }
+    .row-actions { border: none; background: transparent; cursor: pointer; padding: 5px; border-radius: 6px; display: inline-flex; }
+    .row-actions:hover { background: var(--bg-hover); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="ws">
+        <div class="ws-avatar" id="wsAvatar">S</div>
+        <span class="ws-name" id="wsName">Studio</span>
+        <img class="ws-caret-img" src="assets/chevron.svg" alt="" width="12" height="12" />
+      </div>
+
+      <nav class="nav">
+        <a class="nav-item active"><img class="ic" src="assets/crm.svg" alt="" width="16" height="16" />CRM</a>
+        <a class="nav-item" data-nav="team.html"><img class="ic" src="assets/team.svg" alt="" width="18" height="18" />Team</a>
+        <a class="nav-item" data-nav="notifications.html"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B6F76" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications</a>
+
+        <div class="nav-group-label">Apps</div>
+        <a class="nav-item" data-nav="studio.html"><img class="ic" src="assets/home.svg" alt="" width="18" height="18" />Home</a>
+        <a class="nav-item" data-nav="messages.html"><img class="ic" src="assets/message.svg" alt="" width="18" height="18" />Messages</a>
+        <a class="nav-item add" data-nav="studio.html"><img class="ic" src="assets/pls.svg" alt="" width="15" height="15" />Add app</a>
+
+        <div class="nav-group-label">Customize</div>
+        <a class="nav-item" data-nav="brand.html"><img class="ic" src="assets/brand.svg" alt="" width="18" height="18" />Brand</a>
+        <a class="nav-item" data-nav="studio.html"><img class="ic" src="assets/apps.svg" alt="" width="18" height="18" />Apps</a>
+      </nav>
+
+      <div class="spacer"></div>
+
+      <div class="checklist">
+        <div class="checklist-title">Getting started</div>
+        <div class="checklist-item active"><img class="ic" src="assets/progress-indication.svg" alt="" width="14" height="14" />Publish your first app</div>
+        <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Explore the client experience</div>
+        <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Invite your team</div>
+      </div>
+
+      <div class="sidebar-foot">
+        <div class="foot-actions">
+          <button class="icon-btn" type="button"><img src="assets/settings.svg" alt="Settings" width="16" height="16" /></button>
+          <button class="icon-btn" type="button"><img src="assets/helpcenter.svg" alt="Help" width="16" height="16" /></button>
+        </div>
+        <button class="open-portal" type="button">Open Portal <img src="assets/openportal.svg" alt="" width="12" height="12" /></button>
+      </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main">
+      <div class="crm-top">
+        <div class="crm-title">CRM</div>
+        <div class="crm-actions">
+          <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Search</button>
+          <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>View</button>
+          <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+          <button class="btn btn-dark">Create <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active">Contacts</div>
+        <div class="tab">Companies</div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="crm-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Company</th>
+              <th>Status<span class="info"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span></th>
+              <th>Creation date</th>
+              <th class="col-actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="cell-name"><span class="avatar" style="background:#dfe3ee;color:#5a6172">AE</span><div><div class="nm">Ana Eremina</div><div class="em">ana@brandmages.com</div></div></div></td>
+              <td><div class="cell-co"><span class="co-ic" style="background:#1a1a1a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>BrandMages (Test Company)</div></td>
+              <td><span class="badge badge-inactive">Inactive</span></td>
+              <td class="date">6/1/2026</td>
+              <td class="col-actions"><button class="row-actions"><img src="assets/dots.svg" alt="" width="16" height="16" /></button></td>
+            </tr>
+            <tr>
+              <td><div class="cell-name"><span class="avatar" style="background:#d6e4f0;color:#3a6ea5">JD</span><div><div class="nm">John Doe</div><div class="em">john@rocket.com</div></div></div></td>
+              <td><div class="cell-co"><span class="co-ic" style="background:#6b6f76"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="7" rx="1"/><rect x="13" y="3" width="7" height="7" rx="1"/><rect x="13" y="14" width="7" height="7" rx="1"/><rect x="4" y="14" width="7" height="7" rx="1"/></svg></span>Rocket Rides (Test Company)</div></td>
+              <td><span class="badge badge-inactive">Inactive</span></td>
+              <td class="date">6/1/2026</td>
+              <td class="col-actions"><button class="row-actions"><img src="assets/dots.svg" alt="" width="16" height="16" /></button></td>
+            </tr>
+            <tr>
+              <td><div class="cell-name"><span class="avatar" style="background:#f0ddd6;color:#a5613a">JD</span><div><div class="nm">Jane Doe</div><div class="em">jane@rocket.com</div></div></div></td>
+              <td><div class="cell-co"><span class="co-ic" style="background:#6b6f76"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="7" height="7" rx="1"/><rect x="13" y="3" width="7" height="7" rx="1"/><rect x="13" y="14" width="7" height="7" rx="1"/><rect x="4" y="14" width="7" height="7" rx="1"/></svg></span>Rocket Rides (Test Company)</div></td>
+              <td><span class="badge badge-inactive">Inactive</span></td>
+              <td class="date">6/1/2026</td>
+              <td class="col-actions"><button class="row-actions"><img src="assets/dots.svg" alt="" width="16" height="16" /></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function getHashParam(name) {
+      const m = location.hash.match(new RegExp('[#&]' + name + '=([^&]*)'));
+      return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '';
+    }
+    // Reflect the entered company in the sidebar (carried via #company=); default Studio / S.
+    // Allowed avatar color combos (light tint bg + matching text), picked by name.
+    const AVATAR_COLORS = [['#f4f5f7','#1f1f1f'],['#e4f1eb','#44856f'],['#ece8f6','#7a6cb2'],['#f6e5e6','#ac5462'],['#efe9d2','#a5812b'],['#dce9f0','#6e96ad'],['#e8eee0','#8a9070'],['#f2e6f1','#9c4f92']];
+    function avatarColor(s) { let h = 0; s = (s || '').toString(); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return AVATAR_COLORS[h % AVATAR_COLORS.length]; }
+    function paintAvatar(el, name) { const [bg, fg] = avatarColor(name); el.style.background = bg; el.style.color = fg; }
+
+    const company = getHashParam('company');
+    const uName = getHashParam('name');
+    const uEmail = getHashParam('email');
+    const wsDisplay = company || 'Studio';
+    if (company) {
+      document.getElementById('wsName').textContent = company;
+      document.getElementById('wsAvatar').textContent = company.trim()[0].toUpperCase();
+    }
+    paintAvatar(document.getElementById('wsAvatar'), wsDisplay);
+    // Paint each contact avatar from the allowed palette, keyed by the contact's name.
+    document.querySelectorAll('.crm-table tbody tr').forEach(tr => {
+      const av = tr.querySelector('.cell-name .avatar');
+      const nm = tr.querySelector('.cell-name .nm')?.textContent || '';
+      if (av) paintAvatar(av, nm);
+    });
+    // Keep company + identity on cross-page nav links (Team, Home, Add app).
+    const navParams = [];
+    if (company) navParams.push('company=' + encodeURIComponent(company));
+    if (uName) navParams.push('name=' + encodeURIComponent(uName));
+    if (uEmail) navParams.push('email=' + encodeURIComponent(uEmail));
+    if (getHashParam('theme')) navParams.push('theme=' + encodeURIComponent(getHashParam('theme')));
+    const navSuffix = navParams.length ? '#' + navParams.join('&') : '';
+    document.querySelectorAll('[data-nav]').forEach(a => { a.setAttribute('href', a.dataset.nav + navSuffix); });
+    (function(){ const purl = 'portal.html' + navSuffix; const op = document.querySelector('.open-portal'); if (op) op.addEventListener('click', function(){ location.href = purl; }); document.querySelectorAll('.checklist-item').forEach(function(it){ if (it.textContent.indexOf('Explore the client experience') > -1) { it.style.cursor = 'pointer'; it.addEventListener('click', function(){ location.href = purl; }); } }); })();
+  </script>
+</body>
+</html>

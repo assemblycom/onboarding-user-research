@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Assembly Studio — Brand</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --text:#212b36; --muted:#6b6f76; --border:#dfe1e4; --bg-soft:#f8f9fb; --bg-hover:#eff1f4; --dark:#1a1a1a; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: var(--text); background: #fff; -webkit-font-smoothing: antialiased; }
+    .shell { display: flex; height: 100vh; overflow: hidden; }
+
+    /* Sidebar (shared) */
+    .sidebar { width: 248px; flex-shrink: 0; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 14px 12px; gap: 4px; }
+    .ws { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; cursor: pointer; }
+    .ws:hover { background: var(--bg-hover); }
+    .ws-avatar { width: 26px; height: 26px; border-radius: 7px; background: #f4f5f7; border: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #1f1f1f; font-size: 13px; font-weight: 600; }
+    .ws-name { font-weight: 600; font-size: 14px; flex: 1; }
+    .nav { display: flex; flex-direction: column; gap: 1px; margin-top: 8px; }
+    .nav-group-label { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); padding: 14px 8px 5px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; font-size: 13.5px; color: var(--text); cursor: pointer; text-decoration: none; }
+    .nav-item:hover { background: var(--bg-hover); }
+    .nav-item.active { background: var(--bg-hover); font-weight: 500; }
+    .nav-item svg { color: var(--muted); flex-shrink: 0; }
+    .nav-item .ic, .ws-caret-img, .checklist-item .ic { display: block; flex-shrink: 0; }
+    .nav-item.add { color: var(--muted); }
+    .spacer { flex: 1; }
+    .checklist { border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-top: 10px; }
+    .checklist-title { font-size: 12.5px; font-weight: 600; margin-bottom: 10px; }
+    .checklist-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 12.5px; color: var(--muted); }
+    .checklist-item.active { color: var(--text); font-weight: 500; }
+    .sidebar-foot { display: flex; align-items: center; justify-content: space-between; padding: 12px 4px 2px; }
+    .foot-actions { display: flex; align-items: center; gap: 8px; }
+    .sidebar-foot .icon-btn { display: flex; align-items: center; justify-content: center; padding: 7px; border: 1px solid var(--border); background: #fff; border-radius: 999px; cursor: pointer; }
+    .sidebar-foot .icon-btn:hover { background: var(--bg-hover); }
+    .sidebar-foot .open-portal { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px; border: 1px solid var(--border); background: #fff; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; font-family: inherit; }
+    .sidebar-foot .open-portal:hover { background: var(--bg-hover); }
+
+    /* Main */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .page-top { display: flex; align-items: center; padding: 18px 28px; border-bottom: 1px solid var(--border); }
+    .page-title { font-size: 18px; font-weight: 600; }
+    .brand-body { flex: 1; display: flex; min-height: 0; }
+
+    /* Left form */
+    .brand-form { width: 48%; max-width: 560px; flex-shrink: 0; border-right: 1px solid var(--border); overflow-y: auto; padding: 28px; }
+    .section + .section { margin-top: 40px; }
+    .section-title { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
+    .section-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin: 0 0 16px; max-width: 440px; }
+    .field-input { width: 100%; height: 42px; border: 1px solid var(--border); border-radius: 8px; padding: 0 14px; font-family: inherit; font-size: 14px; color: var(--text); }
+    .field-input:focus { outline: none; border-color: #b9bcc1; }
+    .char-count { text-align: right; font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    .asset-row { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-top: 1px solid var(--border); }
+    .asset-info { flex: 1; }
+    .asset-name { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    .asset-name svg { width: 13px; height: 13px; color: #b3b8bf; }
+    .asset-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+    .asset-thumb { width: 42px; height: 42px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .asset-thumb.icon { font-size: 16px; font-weight: 700; }
+    .asset-thumb.logo { background: #1f2937; color: #fff; font-size: 8px; font-weight: 600; gap: 3px; }
+    .asset-thumb.logo .lg-dot { width: 9px; height: 9px; border-radius: 2px; background: #fff; }
+    .asset-thumb.empty { border: 1.5px dashed #c7ccd3; color: #b3b8bf; cursor: pointer; }
+
+    .swatches { display: flex; gap: 14px; margin-top: 6px; }
+    .swatch { }
+    .swatch-chip { width: 100%; height: 40px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); }
+    .swatch-label { font-size: 12px; color: var(--text); margin-top: 6px; font-weight: 500; }
+    .swatch-hex { font-size: 11px; color: var(--muted); }
+    .swatch { width: 120px; }
+
+    /* Right preview */
+    .brand-preview { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .preview-tabs { display: flex; gap: 22px; padding: 0 28px; border-bottom: 1px solid var(--border); }
+    .preview-tab { padding: 12px 2px; font-size: 14px; color: var(--muted); cursor: pointer; border-bottom: 1px solid transparent; margin-bottom: -1px; }
+    .preview-tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--dark); }
+    .preview-stage { flex: 1; padding: 40px; background: var(--bg-soft); display: flex; }
+    .login-card { flex: 1; background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+    .login-form { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 48px; }
+    .login-form .login-icon { width: 44px; height: 44px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 700; margin: 0 auto 28px; }
+    .login-form label { font-size: 12px; font-weight: 500; color: var(--text); display: block; margin: 14px 0 6px; }
+    .login-form .lf-input { width: 100%; height: 40px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+    .login-form .signin { width: 100%; height: 44px; border: none; border-radius: 8px; color: #fff; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 24px; }
+    .login-side { width: 30%; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="ws">
+        <div class="ws-avatar" id="wsAvatar">S</div>
+        <span class="ws-name" id="wsName">Studio</span>
+        <img class="ws-caret-img" src="assets/chevron.svg" alt="" width="12" height="12" />
+      </div>
+      <nav class="nav">
+        <a class="nav-item" data-nav="crm.html"><img class="ic" src="assets/crm.svg" alt="" width="16" height="16" />CRM</a>
+        <a class="nav-item" data-nav="team.html"><img class="ic" src="assets/team.svg" alt="" width="18" height="18" />Team</a>
+        <a class="nav-item" data-nav="notifications.html"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B6F76" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications</a>
+        <div class="nav-group-label">Apps</div>
+        <a class="nav-item" data-nav="studio.html"><img class="ic" src="assets/home.svg" alt="" width="18" height="18" />Home</a>
+        <a class="nav-item" data-nav="messages.html"><img class="ic" src="assets/message.svg" alt="" width="18" height="18" />Messages</a>
+        <a class="nav-item add" data-nav="studio.html"><img class="ic" src="assets/pls.svg" alt="" width="15" height="15" />Add app</a>
+        <div class="nav-group-label">Customize</div>
+        <a class="nav-item active"><img class="ic" src="assets/brand.svg" alt="" width="18" height="18" />Brand</a>
+        <a class="nav-item" data-nav="studio.html"><img class="ic" src="assets/apps.svg" alt="" width="18" height="18" />Apps</a>
+      </nav>
+      <div class="spacer"></div>
+      <div class="checklist">
+        <div class="checklist-title">Getting started</div>
+        <div class="checklist-item active"><img class="ic" src="assets/progress-indication.svg" alt="" width="14" height="14" />Publish your first app</div>
+        <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Explore the client experience</div>
+        <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Invite your team</div>
+      </div>
+      <div class="sidebar-foot">
+        <div class="foot-actions">
+          <button class="icon-btn" type="button"><img src="assets/settings.svg" alt="Settings" width="16" height="16" /></button>
+          <button class="icon-btn" type="button"><img src="assets/helpcenter.svg" alt="Help" width="16" height="16" /></button>
+        </div>
+        <button class="open-portal" type="button">Open Portal <img src="assets/openportal.svg" alt="" width="12" height="12" /></button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="page-top"><div class="page-title">Brand</div></div>
+      <div class="brand-body">
+        <!-- Left: form -->
+        <div class="brand-form">
+          <div class="section">
+            <h2 class="section-title">Brand name</h2>
+            <p class="section-desc">Your brand name is the name your customers use to refer to you. It doesn't need to be your legal business name.</p>
+            <input class="field-input" id="brandNameInput" type="text" value="BrandMages" />
+            <div class="char-count" id="charCount">10 of 30 characters used.</div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Image assets</h2>
+            <p class="section-desc">Your icon and login images are used in various places to customize the experience for you and your clients</p>
+            <div class="asset-row">
+              <div class="asset-info">
+                <div class="asset-name">Square icon <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+                <div class="asset-sub">Used in the navbar, invoices and on mobile</div>
+              </div>
+              <div class="asset-thumb icon" id="assetIcon">B</div>
+            </div>
+            <div class="asset-row">
+              <div class="asset-info">
+                <div class="asset-name">Full logo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+                <div class="asset-sub">Used on login pages</div>
+              </div>
+              <div class="asset-thumb logo"><span class="lg-dot"></span><span id="logoName">BrandMages</span></div>
+            </div>
+            <div class="asset-row">
+              <div class="asset-info">
+                <div class="asset-name">Square login image <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+                <div class="asset-sub">Used on the side of your login page</div>
+              </div>
+              <div class="asset-thumb" id="assetLoginImg"></div>
+            </div>
+            <div class="asset-row">
+              <div class="asset-info">
+                <div class="asset-name">Social sharing image <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+                <div class="asset-sub">Used when a link to your portal is shared</div>
+              </div>
+              <div class="asset-thumb empty"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2 class="section-title">Brand colors</h2>
+            <p class="section-desc">Customize the colors in your portal. Note that these colors only affect your portal and not the internal user experience. The accent is used for buttons, tags, and other UI elements.</p>
+            <div class="swatches">
+              <div class="swatch"><div class="swatch-chip" id="swAccent"></div><div class="swatch-label">Accent</div><div class="swatch-hex" id="swAccentHex">#5b6cf0</div></div>
+              <div class="swatch"><div class="swatch-chip" style="background:#ffffff"></div><div class="swatch-label">Background</div><div class="swatch-hex">#FFFFFF</div></div>
+              <div class="swatch"><div class="swatch-chip" style="background:#1a1a1a"></div><div class="swatch-label">Text</div><div class="swatch-hex">#1A1A1A</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: live preview -->
+        <div class="brand-preview">
+          <div class="preview-tabs">
+            <div class="preview-tab active">Login</div>
+            <div class="preview-tab">Client Portal</div>
+          </div>
+          <div class="preview-stage">
+            <div class="login-card">
+              <div class="login-form">
+                <div class="login-icon" id="loginIcon">B</div>
+                <label>Email</label>
+                <div class="lf-input"></div>
+                <label>Password</label>
+                <div class="lf-input"></div>
+                <button class="signin" id="signinBtn">Sign in</button>
+              </div>
+              <div class="login-side" id="loginSide"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function getHashParam(name) { const m = location.hash.match(new RegExp('[#&]' + name + '=([^&]*)')); return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : ''; }
+    const AVATAR_COLORS = [['#f4f5f7','#1f1f1f'],['#e4f1eb','#44856f'],['#ece8f6','#7a6cb2'],['#f6e5e6','#ac5462'],['#efe9d2','#a5812b'],['#dce9f0','#6e96ad'],['#e8eee0','#8a9070'],['#f2e6f1','#9c4f92']];
+    function avatarColor(s) { let h = 0; s = (s || '').toString(); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return AVATAR_COLORS[h % AVATAR_COLORS.length]; }
+
+    // Colors come from the theme picked in onboarding's customization step.
+    const THEMES = {
+      brand:  { accent: '#5b6cf0', panel: '#d9def9' },
+      dark:   { accent: '#1f1f22', panel: '#2a2a2e' },
+      light:  { accent: '#8a9070', panel: '#e8eee0' },
+    };
+    const theme = THEMES[getHashParam('theme')] || THEMES.brand;
+
+    const company = getHashParam('company') || 'Studio';
+    const letter = company.trim()[0].toUpperCase();
+    const [avBg, avFg] = avatarColor(company);
+
+    // Sidebar
+    document.getElementById('wsName').textContent = company;
+    const wa = document.getElementById('wsAvatar'); wa.textContent = letter; wa.style.background = avBg; wa.style.color = avFg;
+
+    // Brand name (test client info, as if filled out)
+    const bn = document.getElementById('brandNameInput'); bn.value = company;
+    document.getElementById('charCount').textContent = company.length + ' of 30 characters used.';
+
+    // Image assets
+    const ai = document.getElementById('assetIcon'); ai.textContent = letter; ai.style.background = avBg; ai.style.color = avFg;
+    document.getElementById('logoName').textContent = company;
+    document.getElementById('assetLoginImg').style.background = theme.panel;
+
+    // Brand colors (accent from theme)
+    document.getElementById('swAccent').style.background = theme.accent;
+    document.getElementById('swAccentHex').textContent = theme.accent.toUpperCase();
+
+    // Login preview
+    const li = document.getElementById('loginIcon'); li.textContent = letter; li.style.background = avBg; li.style.color = avFg;
+    document.getElementById('signinBtn').style.background = theme.accent;
+    document.getElementById('loginSide').style.background = theme.panel;
+
+    // Carry params on nav links
+    const navParams = [];
+    ['company','name','email','theme'].forEach(k => { const v = getHashParam(k); if (v) navParams.push(k + '=' + encodeURIComponent(v)); });
+    const navSuffix = navParams.length ? '#' + navParams.join('&') : '';
+    document.querySelectorAll('[data-nav]').forEach(a => { a.setAttribute('href', a.dataset.nav + navSuffix); });
+    (function(){ const purl = 'portal.html' + navSuffix; const op = document.querySelector('.open-portal'); if (op) op.addEventListener('click', function(){ location.href = purl; }); document.querySelectorAll('.checklist-item').forEach(function(it){ if (it.textContent.indexOf('Explore the client experience') > -1) { it.style.cursor = 'pointer'; it.addEventListener('click', function(){ location.href = purl; }); } }); })();
+  </script>
+</body>
+</html>

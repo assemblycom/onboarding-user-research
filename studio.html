@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Assembly Studio — Add App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --text: #212b36;
+      --muted: #6b6f76;
+      --border: #dfe1e4;
+      --bg-soft: #f8f9fb;
+      --bg-hover: #eff1f4;
+      --dark: #1a1a1a;
+      --accent: #5b6cf0;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: var(--text); background: #fff; -webkit-font-smoothing: antialiased; }
+    .shell { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: 248px; flex-shrink: 0; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 14px 12px; gap: 4px; }
+    .ws { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; cursor: pointer; }
+    .ws:hover { background: var(--bg-hover); }
+    .ws-avatar { width: 26px; height: 26px; border-radius: 7px; background: #f4f5f7; border: 1px solid rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #1f1f1f; font-size: 13px; font-weight: 600; }
+    .ws-name { font-weight: 600; font-size: 14px; flex: 1; }
+    .ws-caret { color: var(--muted); }
+    .nav { display: flex; flex-direction: column; gap: 1px; margin-top: 8px; }
+    .nav-group-label { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); padding: 14px 8px 5px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; font-size: 13.5px; color: var(--text); cursor: pointer; text-decoration: none; }
+    .nav-item:hover { background: var(--bg-hover); }
+    .nav-item.active { background: var(--bg-hover); font-weight: 500; }
+    .nav-item svg { color: var(--muted); flex-shrink: 0; }
+    .nav-item .ic, .ws-caret-img, .checklist-item .ic { display: block; flex-shrink: 0; }
+    .nav-item.add { color: var(--muted); }
+
+    .spacer { flex: 1; }
+
+    /* Checklist panel */
+    .checklist { border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-top: 10px; }
+    .checklist-title { font-size: 12.5px; font-weight: 600; margin-bottom: 10px; }
+    .checklist-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 12.5px; color: var(--muted); position: relative; }
+    .checklist-item .dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #c7ccd3; flex-shrink: 0; background: #fff; }
+    .checklist-item.done .dot { border-color: var(--dark); background: var(--dark); }
+    .checklist-item.active { color: var(--text); font-weight: 500; }
+    .checklist-item.active .dot { border-color: var(--dark); box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px var(--dark); }
+
+    .sidebar-foot { display: flex; align-items: center; justify-content: space-between; padding: 12px 4px 2px; }
+    .foot-actions { display: flex; align-items: center; gap: 8px; }
+    .sidebar-foot .icon-btn { display: flex; align-items: center; justify-content: center; padding: 7px; border: 1px solid var(--border); background: #fff; border-radius: 999px; cursor: pointer; transition: background 0.12s; }
+    .sidebar-foot .icon-btn:hover { background: var(--bg-hover); }
+    .sidebar-foot .open-portal { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px; border: 1px solid var(--border); background: #fff; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; font-family: inherit; transition: background 0.12s; }
+    .sidebar-foot .open-portal:hover { background: var(--bg-hover); }
+
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    .topbar { padding: 18px 28px 0; }
+    .topbar-title { font-size: 15px; font-weight: 400; }
+    .tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border); margin-top: 14px; padding: 0 28px; }
+    .tab { padding: 10px 2px; font-size: 14px; color: var(--muted); cursor: pointer; border-bottom: 1px solid transparent; margin-bottom: -1px; }
+    .tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--dark); }
+
+    .content { max-width: 740px; margin: 0 auto; width: 100%; padding: 64px 24px 60px; }
+    .greeting { font-size: 26px; font-weight: 500; letter-spacing: -0.01em; margin: 0 0 18px; }
+
+    .promptbox { border: 1px solid var(--border); border-radius: 14px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
+    .promptbox:focus-within { border-color: #b9bcc1; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .promptbox textarea { width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 15px; line-height: 1.55; color: var(--text); padding: 16px 18px 6px; min-height: 70px; max-height: 240px; background: transparent; }
+    .promptbox textarea::placeholder { color: #9aa0a6; }
+    .promptbox-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 12px; }
+    .attach { width: 30px; height: 30px; border: none; background: transparent; border-radius: 8px; color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .attach:hover { background: var(--bg-hover); }
+    .start-btn { background: var(--dark); color: #fff; border: none; border-radius: 8px; padding: 9px 16px; font-family: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+    .start-btn:hover { opacity: 0.88; }
+
+    .chips { display: flex; gap: 8px; margin-top: 16px; flex-wrap: nowrap; overflow: hidden; }
+    .chip { flex-shrink: 0; font-size: 13px; color: var(--text); background: #fff; border: 1px solid var(--border); border-radius: 99px; padding: 7px 14px; cursor: pointer; font-family: inherit; transition: background 0.12s, border-color 0.12s; }
+    .chip:hover { background: var(--bg-soft); border-color: #c7ccd3; }
+    .chip-more { width: 36px; padding: 7px 0; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+
+    /* Templates */
+    .templates { max-width: 1100px; margin: 0 auto; width: 100%; padding: 0 24px 60px; }
+    .templates-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .templates-title { font-size: 15px; font-weight: 600; }
+    .templates-nav { display: flex; gap: 8px; }
+    .templates-nav button { width: 30px; height: 30px; border: 1px solid var(--border); background: #fff; border-radius: 8px; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .templates-nav button:hover { background: var(--bg-hover); }
+    .template-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .template-card { cursor: pointer; }
+    .template-thumb { border: 1px solid var(--border); border-radius: 12px; height: 150px; background: linear-gradient(135deg, #f3f4f7, #e9ebef); overflow: hidden; position: relative; }
+    .template-thumb::after { content: 'Proposal Builder'; position: absolute; top: 14px; left: 16px; font-size: 9px; font-weight: 600; color: #9aa0a6; }
+    .template-name { font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
+    .template-desc { font-size: 13px; color: var(--muted); line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="ws">
+        <div class="ws-avatar" id="wsAvatar">S</div>
+        <span class="ws-name" id="wsName">Studio</span>
+        <img class="ws-caret-img" src="assets/chevron.svg" alt="" width="12" height="12" />
+      </div>
+
+      <nav class="nav">
+        <a class="nav-item" data-nav="crm.html"><img class="ic" src="assets/crm.svg" alt="" width="16" height="16" />CRM</a>
+        <a class="nav-item" data-nav="team.html"><img class="ic" src="assets/team.svg" alt="" width="18" height="18" />Team</a>
+        <a class="nav-item" data-nav="notifications.html"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B6F76" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications</a>
+
+        <div class="nav-group-label">Apps</div>
+        <a class="nav-item"><img class="ic" src="assets/home.svg" alt="" width="18" height="18" />Home</a>
+        <a class="nav-item" data-nav="messages.html"><img class="ic" src="assets/message.svg" alt="" width="18" height="18" />Messages</a>
+        <a class="nav-item add active"><img class="ic" src="assets/pls.svg" alt="" width="15" height="15" />Add app</a>
+
+        <div class="nav-group-label">Customize</div>
+        <a class="nav-item" data-nav="brand.html"><img class="ic" src="assets/brand.svg" alt="" width="18" height="18" />Brand</a>
+        <a class="nav-item" data-nav="studio.html"><img class="ic" src="assets/apps.svg" alt="" width="18" height="18" />Apps</a>
+      </nav>
+
+      <div class="spacer"></div>
+
+      <div class="checklist">
+        <div class="checklist-title">Getting started</div>
+        <div class="checklist-item active"><img class="ic" src="assets/progress-indication.svg" alt="" width="14" height="14" />Publish your first app</div>
+        <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Explore the client experience</div>
+        <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Invite your team</div>
+      </div>
+
+      <div class="sidebar-foot">
+        <div class="foot-actions">
+          <button class="icon-btn" type="button"><img src="assets/settings.svg" alt="Settings" width="16" height="16" /></button>
+          <button class="icon-btn" type="button"><img src="assets/helpcenter.svg" alt="Help" width="16" height="16" /></button>
+        </div>
+        <button class="open-portal" type="button">Open Portal <img src="assets/openportal.svg" alt="" width="12" height="12" /></button>
+      </div>
+    </aside>
+
+    <!-- ── Main ── -->
+    <main class="main">
+      <div class="topbar"><div class="topbar-title">Add App</div></div>
+      <div class="tabs">
+        <div class="tab active">Build</div>
+        <div class="tab">Browse</div>
+      </div>
+
+      <div class="content">
+        <h1 class="greeting">What will you build?</h1>
+        <div class="promptbox">
+          <textarea id="buildPrompt" rows="2" placeholder="Describe the app you want to build for your clients…"></textarea>
+          <div class="promptbox-bar">
+            <button class="attach" title="Attach"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+            <button class="start-btn" id="startBuilding" type="button">Start Building</button>
+          </div>
+        </div>
+
+        <div class="chips" id="chips">
+          <button class="chip" data-prompt="A client onboarding flow with intake forms, e-signatures, and document upload">Onboarding</button>
+          <button class="chip" data-prompt="A client dashboard showing project status, recent activity, and key metrics">Dashboard</button>
+          <button class="chip" data-prompt="An approvals workflow where clients review and sign off on deliverables">Approvals</button>
+          <button class="chip" data-prompt="A request intake app where clients submit and track requests">Requests</button>
+          <button class="chip" data-prompt="A proposal builder to create, send, and track client proposals">Proposals</button>
+          <button class="chip" data-prompt="An AI assistant that answers client questions from my knowledge base">AI Assistants</button>
+          <button class="chip chip-more" title="More"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="templates">
+        <div class="templates-head">
+          <div class="templates-title">Remix from app templates</div>
+          <div class="templates-nav">
+            <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+            <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+          </div>
+        </div>
+        <div class="template-grid">
+          <div class="template-card"><div class="template-thumb"></div><div class="template-name">Proposal Builder</div><div class="template-desc">Track stock levels, orders, and warehouse locations in real-time</div></div>
+          <div class="template-card"><div class="template-thumb"></div><div class="template-name">Proposal Builder</div><div class="template-desc">Track stock levels, orders, and warehouse locations in real-time</div></div>
+          <div class="template-card"><div class="template-thumb"></div><div class="template-name">Proposal Builder</div><div class="template-desc">Track stock levels, orders, and warehouse locations in real-time</div></div>
+          <div class="template-card"><div class="template-thumb"></div><div class="template-name">Proposal Builder</div><div class="template-desc">Track stock levels, orders, and warehouse locations in real-time</div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Read the prompt passed from the marketing site / chip selection (#prompt=…)
+    function getHashParam(name) {
+      const m = location.hash.match(new RegExp('[#&]' + name + '=([^&]*)'));
+      return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : '';
+    }
+
+    // Reflect the company the user entered in the sidebar (name + letter avatar).
+    // Falls back to "BrandMages" / "B" when none was provided (e.g. the Google path).
+    // Allowed avatar color combos (light tint bg + matching text), picked by name.
+    const AVATAR_COLORS = [['#f4f5f7','#1f1f1f'],['#e4f1eb','#44856f'],['#ece8f6','#7a6cb2'],['#f6e5e6','#ac5462'],['#efe9d2','#a5812b'],['#dce9f0','#6e96ad'],['#e8eee0','#8a9070'],['#f2e6f1','#9c4f92']];
+    function avatarColor(s) { let h = 0; s = (s || '').toString(); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return AVATAR_COLORS[h % AVATAR_COLORS.length]; }
+
+    const company = getHashParam('company');
+    const uName = getHashParam('name');
+    const uEmail = getHashParam('email');
+    const wsDisplay = company || 'Studio';
+    if (company) {
+      document.getElementById('wsName').textContent = company;
+      document.getElementById('wsAvatar').textContent = company.trim()[0].toUpperCase();
+    }
+    (function () { const a = document.getElementById('wsAvatar'); const [bg, fg] = avatarColor(wsDisplay); a.style.background = bg; a.style.color = fg; })();
+    // Carry company + identity onto cross-page nav links (CRM, Team).
+    const navParams = [];
+    if (company) navParams.push('company=' + encodeURIComponent(company));
+    if (uName) navParams.push('name=' + encodeURIComponent(uName));
+    if (uEmail) navParams.push('email=' + encodeURIComponent(uEmail));
+    if (getHashParam('theme')) navParams.push('theme=' + encodeURIComponent(getHashParam('theme')));
+    const navSuffix = navParams.length ? '#' + navParams.join('&') : '';
+    document.querySelectorAll('[data-nav]').forEach(a => { a.setAttribute('href', a.dataset.nav + navSuffix); });
+    (function(){ const purl = 'portal.html' + navSuffix; const op = document.querySelector('.open-portal'); if (op) op.addEventListener('click', function(){ location.href = purl; }); document.querySelectorAll('.checklist-item').forEach(function(it){ if (it.textContent.indexOf('Explore the client experience') > -1) { it.style.cursor = 'pointer'; it.addEventListener('click', function(){ location.href = purl; }); } }); })();
+
+    const promptField = document.getElementById('buildPrompt');
+    const startBtn = document.getElementById('startBuilding');
+
+    function autosize() {
+      promptField.style.height = 'auto';
+      promptField.style.height = Math.min(promptField.scrollHeight, 240) + 'px';
+    }
+    function updateStart() {
+      const has = promptField.value.trim().length > 0;
+      startBtn.disabled = !has;
+      startBtn.style.opacity = has ? '1' : '0.45';
+      startBtn.style.cursor = has ? 'pointer' : 'default';
+    }
+
+    // Pre-fill from the website prompt if one was entered/chosen
+    const initial = getHashParam('prompt');
+    if (initial) promptField.value = initial;
+    autosize();
+    updateStart();
+
+    promptField.addEventListener('input', () => { autosize(); updateStart(); });
+
+    // Chips below let them pick a starting prompt if they didn't type one
+    document.querySelectorAll('#chips .chip[data-prompt]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        promptField.value = chip.dataset.prompt;
+        autosize();
+        updateStart();
+        promptField.focus();
+      });
+    });
+
+    // Start Building → kick off the existing build process (plan mode etc.)
+    function startBuilding() {
+      const p = promptField.value.trim();
+      if (!p) { promptField.focus(); return; }
+      window.location.href = 'builder.html#prompt=' + encodeURIComponent(p);
+    }
+    startBtn.addEventListener('click', startBuilding);
+    promptField.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); startBuilding(); }
+    });
+  </script>
+</body>
+</html>

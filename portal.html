@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Client Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --text:#212b36; --muted:#6b6f76; --border:#e6e8eb; --side:#d9def9; --side-tx:#2f3650; --side-active:rgba(255,255,255,0.7); }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; color: var(--text); background: #fff; -webkit-font-smoothing: antialiased; }
+    .shell { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── Client portal sidebar (themed) ── */
+    .side { width: 230px; flex-shrink: 0; background: var(--side); color: var(--side-tx); display: flex; flex-direction: column; padding: 14px 12px; }
+    .side-ws { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; cursor: pointer; }
+    .side-ws:hover { background: rgba(255,255,255,0.35); }
+    .side-av { width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; font-weight: 600; border: 1px solid rgba(0,0,0,0.06); }
+    .side-name { font-weight: 600; font-size: 14px; flex: 1; color: var(--side-tx); }
+    .side-caret { opacity: 0.55; }
+    .side-nav { display: flex; flex-direction: column; gap: 2px; margin-top: 12px; }
+    .side-item { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: 8px; font-size: 13.5px; color: var(--side-tx); cursor: pointer; text-decoration: none; }
+    .side-item:hover { background: rgba(255,255,255,0.35); }
+    .side-item.active { background: var(--side-active); font-weight: 500; }
+    .side-item svg { flex-shrink: 0; opacity: 0.85; }
+    .side-foot { margin-top: auto; padding: 6px; }
+    .side-foot .gear { width: 32px; height: 32px; border: none; background: transparent; border-radius: 8px; cursor: pointer; color: var(--side-tx); opacity: 0.7; display: flex; align-items: center; justify-content: center; }
+    .side-foot .gear:hover { background: rgba(255,255,255,0.35); }
+
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+    .crumb { padding: 14px 32px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--muted); }
+    .content { max-width: 860px; width: 100%; margin: 0 auto; padding: 36px 32px 80px; }
+
+    .hello { font-size: 26px; font-weight: 600; margin: 0 0 4px; }
+    .hello-sub { font-size: 14px; color: var(--muted); margin: 0 0 24px; }
+    .hero { height: 200px; border-radius: 14px; background: linear-gradient(115deg, #1c1f26 0%, #2f3a47 40%, #5b6675 70%, #aeb6c2 100%); position: relative; overflow: hidden; margin-bottom: 24px; }
+    .hero::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(105deg, rgba(255,255,255,0.05) 0 10px, rgba(255,255,255,0) 10px 22px); }
+
+    .actions { display: flex; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 36px; }
+    .action { flex: 1; display: flex; align-items: center; gap: 9px; padding: 14px 16px; font-size: 13.5px; }
+    .action + .action { border-left: 1px solid var(--border); }
+    .action svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+    .action b { font-weight: 500; }
+
+    .sec-title { font-size: 18px; font-weight: 600; margin: 0 0 10px; }
+    .sec-text { font-size: 14px; line-height: 1.6; color: #3f4651; margin: 0 0 16px; }
+    .note { font-size: 12.5px; color: var(--muted); margin: 22px 0 10px; }
+
+    .hours { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .hours th { background: var(--bg-soft, #f8f9fb); text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    .hours td { padding: 10px 14px; font-size: 13.5px; border-bottom: 1px solid var(--border); }
+    .hours tr:last-child td { border-bottom: none; }
+
+    .how { margin-top: 40px; }
+    .how-item { display: flex; gap: 12px; padding: 12px 0; }
+    .how-item .he { font-size: 16px; line-height: 1.4; flex-shrink: 0; width: 22px; text-align: center; }
+    .how-item .ht { font-size: 13.5px; }
+    .how-item .ht b { font-weight: 600; }
+    .how-item .ht span { color: var(--muted); }
+
+    /* Prototype-only: return to the admin portal (real life = new tab) */
+    .exit-preview { position: fixed; top: 16px; right: 18px; z-index: 50; display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 14px; background: #1a1a1a; color: #fff; border: none; border-radius: 999px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.18); text-decoration: none; }
+    .exit-preview:hover { background: #000; }
+    .exit-preview svg { width: 14px; height: 14px; }
+  </style>
+</head>
+<body>
+  <a class="exit-preview" id="exitPreview" href="studio.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Back to Studio</a>
+
+  <div class="shell">
+    <!-- Themed client sidebar -->
+    <aside class="side">
+      <div class="side-ws">
+        <div class="side-av" id="sideAv">S</div>
+        <span class="side-name" id="sideName">Studio</span>
+        <svg class="side-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+      <nav class="side-nav">
+        <a class="side-item active"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>Home</a>
+        <a class="side-item"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</a>
+      </nav>
+      <div class="side-foot">
+        <button class="gear"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="crumb">Home</div>
+      <div class="content">
+        <h1 class="hello" id="hello">Good morning, there</h1>
+        <p class="hello-sub">Here's what needs your attention today</p>
+
+        <div class="hero"></div>
+
+        <div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px">Your actions</div>
+        <div class="actions">
+          <div class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><b>Pay 3 invoices</b></div>
+          <div class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><b>Sign 1 contract</b></div>
+          <div class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg><b>Submit 3 forms</b></div>
+          <div class="action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><b>Do 2 vibe actions</b></div>
+        </div>
+
+        <h2 class="sec-title">About us</h2>
+        <p class="sec-text" id="aboutText">BrandMages, a full-service marketing agency that helps businesses increase their brand awareness, attract new customers, and grow their bottom line. We specialize in crafting unique and effective marketing strategies that align with your business goals and help you stand out in a crowded marketplace.</p>
+        <div class="note">Apps below should show if they are enabled in the workspace</div>
+        <table class="hours">
+          <thead><tr><th>Days</th><th>Hours (EST)</th></tr></thead>
+          <tbody>
+            <tr><td>M–F</td><td>8AM – 6PM</td></tr>
+            <tr><td>Sat</td><td>10AM – 5PM</td></tr>
+            <tr><td>Sun</td><td>—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="how">
+          <h2 class="sec-title">How to use the portal</h2>
+          <p class="sec-text">Save the link to this portal. If you miss an email notification, you can always log in and check this portal for reminders on important tasks and actions required. Explore the options on your left sidebar. We may add more options tailored to your experience.</p>
+          <div class="how-item"><span class="he">💬</span><div class="ht"><b>Messages</b><br><span>Questions? Chat with the team and get answers.</span></div></div>
+          <div class="how-item"><span class="he">📁</span><div class="ht"><b>Files</b><br><span>Use this tab to share files with the <span id="filesCo">BrandMages</span> team — you can upload any required documents and assets here. This is where we will store files for reference in the future.</span></div></div>
+          <div class="how-item"><span class="he">📝</span><div class="ht"><b>Contracts</b><br><span>View and sign contracts shared by our team.</span></div></div>
+          <div class="how-item"><span class="he">➕</span><div class="ht"><b>Forms</b><br><span>Fill out forms with all relevant information.</span></div></div>
+          <div class="how-item"><span class="he">💳</span><div class="ht"><b>Billing</b><br><span>Here you will see any active subscriptions you have and any invoices after we send them to you.</span></div></div>
+          <div class="how-item"><span class="he">📕</span><div class="ht"><b>Helpdesk</b><br><span>Access a collection of helpful articles we have put together.</span></div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function getHashParam(name) { const m = location.hash.match(new RegExp('[#&]' + name + '=([^&]*)')); return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : ''; }
+    const AVATAR_COLORS = [['#f4f5f7','#1f1f1f'],['#e4f1eb','#44856f'],['#ece8f6','#7a6cb2'],['#f6e5e6','#ac5462'],['#efe9d2','#a5812b'],['#dce9f0','#6e96ad'],['#e8eee0','#8a9070'],['#f2e6f1','#9c4f92']];
+    function avatarColor(s) { let h = 0; s = (s || '').toString(); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return AVATAR_COLORS[h % AVATAR_COLORS.length]; }
+
+    // Sidebar color reflects the theme chosen in onboarding's customization step.
+    const PORTAL_THEME = {
+      brand: { side: '#d9def9', tx: '#2f3650', active: 'rgba(255,255,255,0.7)' },
+      dark:  { side: '#1f1f22', tx: '#d6d6db', active: 'rgba(255,255,255,0.12)' },
+      light: { side: '#e8eee0', tx: '#3a3a3a', active: 'rgba(255,255,255,0.7)' },
+    };
+    const t = PORTAL_THEME[getHashParam('theme')] || PORTAL_THEME.brand;
+    document.documentElement.style.setProperty('--side', t.side);
+    document.documentElement.style.setProperty('--side-tx', t.tx);
+    document.documentElement.style.setProperty('--side-active', t.active);
+
+    const company = getHashParam('company') || 'Studio';
+    const first = (getHashParam('name') || '').trim().split(/\s+/)[0] || 'there';
+
+    // Brand the portal with the company
+    document.getElementById('sideName').textContent = company;
+    const sa = document.getElementById('sideAv'); sa.textContent = company.trim()[0].toUpperCase();
+    const [abg, afg] = avatarColor(company); sa.style.background = abg; sa.style.color = afg;
+    document.getElementById('hello').textContent = 'Good morning, ' + first;
+    document.getElementById('aboutText').textContent = company + ', a full-service marketing agency that helps businesses increase their brand awareness, attract new customers, and grow their bottom line. We specialize in crafting unique and effective marketing strategies that align with your business goals and help you stand out in a crowded marketplace.';
+    document.getElementById('filesCo').textContent = company;
+
+    // Keep params on the "Back to Studio" link so returning preserves state.
+    const navParams = [];
+    ['company','name','email','theme'].forEach(k => { const v = getHashParam(k); if (v) navParams.push(k + '=' + encodeURIComponent(v)); });
+    document.getElementById('exitPreview').setAttribute('href', 'studio.html' + (navParams.length ? '#' + navParams.join('&') : ''));
+  </script>
+</body>
+</html>
