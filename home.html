@@ -40,25 +40,26 @@
 
     /* Workspace: full-width Home bar, then editor + customization row */
     .workspace { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-    .page-top { height: 52px; flex-shrink: 0; display: flex; align-items: center; padding: 0 28px; border-bottom: 1px solid var(--border); }
+    .page-top { height: 52px; flex-shrink: 0; display: flex; align-items: center; padding: 0 24px; border-bottom: 1px solid var(--border); }
     .page-title { font-size: 13px; font-weight: 500; color: var(--text); }
     .editor-row { flex: 1; display: flex; min-height: 0; }
 
     /* Editor */
     .editor { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-    .editor-top { display: flex; align-items: center; justify-content: space-between; height: 52px; flex-shrink: 0; padding: 0 16px 0 20px; border-bottom: 1px solid var(--border); gap: 16px; }
+    .editor-top { display: flex; align-items: center; justify-content: space-between; height: 52px; flex-shrink: 0; padding: 0 18px 0 24px; border-bottom: 1px solid var(--border); gap: 16px; }
     .ed-tabs { display: flex; gap: 18px; align-self: stretch; align-items: center; }
     .ed-tab { font-size: 13px; color: var(--muted); cursor: pointer; height: 100%; display: flex; align-items: center; border-bottom: 2px solid transparent; }
     .ed-tab.active { color: var(--text); font-weight: 500; border-bottom-color: var(--dark); }
-    .ed-toolbar { display: flex; align-items: center; gap: 1px; }
+    .ed-toolbar { display: flex; align-items: center; gap: 2px; }
     .ed-tool { width: 28px; height: 28px; border: none; background: transparent; border-radius: 6px; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .ed-tool:hover { background: var(--bg-hover); }
-    .ed-tool svg { width: 15px; height: 15px; }
-    .ed-tool img { width: 14px; height: 14px; display: block; }
-    .ed-sep { width: 1px; height: 18px; background: var(--border); margin: 0 5px; }
+    .ed-tool svg { width: 16px; height: 16px; }
+    .ed-tool img { width: 16px; height: 16px; display: block; }
+    .ed-tool svg + svg { width: 11px; height: 11px; } /* dropdown caret stays small */
+    .ed-sep { width: 1px; height: 18px; background: var(--border); margin: 0 6px; }
 
     .canvas { flex: 1; overflow-y: auto; }
-    .doc { max-width: 680px; margin: 0 auto; padding: 36px 24px 80px; }
+    .doc { max-width: 760px; margin: 0; padding: 28px 24px 80px; }
     .doc-h1 { font-size: 26px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
     .token { display: inline-block; background: #eef0fb; color: #4a55b8; border-radius: 5px; padding: 1px 7px; font-size: 0.92em; font-weight: 500; }
     .doc-sub { font-size: 14px; color: var(--muted); margin: 0 0 22px; }
@@ -76,7 +77,7 @@
     .token-sm { background: #eef0fb; color: #4a55b8; border-radius: 4px; padding: 0 5px; font-weight: 500; }
 
     /* Customization panel */
-    .cust { width: 244px; flex-shrink: 0; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+    .cust { width: 320px; flex-shrink: 0; border-left: 1px solid var(--border); display: flex; flex-direction: column; }
     .cust-head { height: 52px; flex-shrink: 0; display: flex; align-items: center; padding: 0 18px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 500; }
     .cust-list { padding: 8px; display: flex; flex-direction: column; gap: 2px; }
     .cust-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 12px; border-radius: 8px; font-size: 13.5px; color: var(--text); cursor: pointer; }
