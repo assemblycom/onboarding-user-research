@@ -239,6 +239,42 @@ document.addEventListener('DOMContentLoaded', async function() {
   var PAYLOAD = parseHash();
   var BUILD_DURATION = 60000;
 
+  // ============================================================
+  // Derive a short app name from the user's prompt, so the sidebar
+  // draft entry + the topbar title reflect what's actually being built
+  // (e.g. "A client dashboard…" → "Dashboard") instead of a hardcoded
+  // "Time Tracker" / "Untitled".
+  // ============================================================
+  function deriveAppName(prompt) {
+    var p = (' ' + (prompt || '') + ' ').toLowerCase();
+    var rules = [
+      [/time ?track|timesheet|log (my )?hours/, 'Time Tracker'],
+      [/dashboard/, 'Dashboard'],
+      [/client portal|\bportal\b/, 'Client Portal'],
+      [/onboard/, 'Onboarding'],
+      [/approval/, 'Approvals'],
+      [/\brequest/, 'Requests'],
+      [/proposal/, 'Proposals'],
+      [/invoice|billing|payment/, 'Billing'],
+      [/inventory|stock/, 'Inventory'],
+      [/ticket|help ?desk|support/, 'Support Desk'],
+      [/\bcrm\b|contact|lead/, 'CRM'],
+      [/project/, 'Projects'],
+      [/assistant|chatbot|\bai\b/, 'AI Assistant'],
+      [/track/, 'Tracker']
+    ];
+    for (var i = 0; i < rules.length; i++) { if (rules[i][0].test(p)) return rules[i][1]; }
+    // Fallback: Title-case the first couple of meaningful words.
+    var stop = { a:1, an:1, the:1, my:1, our:1, build:1, me:1, create:1, make:1, app:1, with:1, for:1, that:1, to:1 };
+    var words = (prompt || '').replace(/[^a-zA-Z0-9 ]/g, ' ').trim().split(/\s+/)
+      .filter(function(w) { return w && !stop[w.toLowerCase()]; }).slice(0, 2);
+    if (words.length) return words.map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+    return 'My App';
+  }
+  var APP_NAME = deriveAppName(PAYLOAD.prompt);
+  // Shared with the injected sidebar script (builder-sidebar.js).
+  try { window.__asmAppName = APP_NAME; } catch (e) {}
+
   // Bundle is a React app — synthetic .click() doesn't fire its
   // delegated handlers. Reach into the fiber's props and call onClick
   // directly with a minimal synthetic event. Hoisted to IIFE scope so
@@ -321,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     followupBusy: false,
     followupIdx: 0,
     userChatWidth: null,         // populated on first transition out of QA
-    appTitle: 'Untitled',
+    appTitle: APP_NAME,
     appIcon: 'clock',            // sidebar icon key
     isPublished: false,
     appVersion: 0,               // increments on each publish
@@ -444,7 +480,10 @@ document.addEventListener('DOMContentLoaded', async function() {
       // The Editor/Live toggle is hidden across QA/building AND in done
       // until first publish (nothing is "live" before that). A separate
       // rule keyed off `body:not(.asm-published)` handles the toggle.
-      'body.asm-phase-qa div[style*="display: flex"][style*="align-items: center"][style*="gap: 4px"]:has(> button[style*="font-size: 12px"]), body.asm-phase-building div[style*="display: flex"][style*="align-items: center"][style*="gap: 4px"]:has(> button[style*="font-size: 12px"]) { opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }',
+      // Hide the Dashboard/Portal tab cluster during Q&A only. During the
+      // build we keep it VISIBLE but disabled (see styleBundleTabs) so the
+      // app chrome reads as "loading", then it enables once done.
+      'body.asm-phase-qa div[style*="display: flex"][style*="align-items: center"][style*="gap: 4px"]:has(> button[style*="font-size: 12px"]) { opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }',
       'body:not(.asm-published) div[style*="background: rgb(242, 243, 246)"][style*="border-radius: 7px"] { opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }',
       // Hide the bundle's Publish + Version-history buttons — our own
       // (in `.asm-topbar-right`) cover them across all phases. Tagged via
@@ -1031,8 +1070,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       // so there is no squish/overlap when the timeline mounts.
       'body.asm-phase-building .asm-req-msg, body.asm-phase-done .asm-req-msg { flex:0 0 auto !important; display:block !important; }',
       'body.asm-phase-building .asm-req-msg .asm-req-card, body.asm-phase-done .asm-req-msg .asm-req-card { flex:0 0 auto !important; }',
-      'body.asm-phase-building .asm-req-card .asm-req-body, body.asm-phase-done .asm-req-card .asm-req-body { flex:0 0 auto !important; min-height:126px; max-height:210px; overflow:hidden !important; }',
-      'body.asm-phase-building .asm-req-card .asm-req-body::after, body.asm-phase-done .asm-req-card .asm-req-body::after { content:""; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 92%); pointer-events:none; }',
+      // Compact while collapsed; "Show more" lifts the clamp to reveal the
+      // full requirements list (scoped to :not(.expanded) so expanding wins).
+      'body.asm-phase-building .asm-req-card:not(.expanded) .asm-req-body, body.asm-phase-done .asm-req-card:not(.expanded) .asm-req-body { flex:0 0 auto !important; min-height:126px; max-height:210px; overflow:hidden !important; }',
+      'body.asm-phase-building .asm-req-card:not(.expanded) .asm-req-body::after, body.asm-phase-done .asm-req-card:not(.expanded) .asm-req-body::after { content:""; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 92%); pointer-events:none; }',
+      'body.asm-phase-building .asm-req-card:not(.expanded) .asm-req-showmore, body.asm-phase-done .asm-req-card:not(.expanded) .asm-req-showmore { display:inline-block !important; }',
       '.asm-req-card.asm-req-overflow:not(.expanded) .asm-req-body::after { content:""; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 92%); pointer-events:none; }',
       '.asm-req-body > *:first-child { margin-top:0; }',
       '.asm-req-body p { margin:0 0 8px; }',
@@ -1312,23 +1354,29 @@ document.addEventListener('DOMContentLoaded', async function() {
       // of the app being assembled (topbar tabs → toolbar → data table)
       // so the user sees the layout take shape, with a live status caption
       // beneath. Replaces the old marketing carousel.
-      '.asm-cv-appskel { width:100%; max-width:520px; display:flex; flex-direction:column; gap:16px; }',
+      // Fills the white preview card (matches .asm-carousel::before inset).
+      '.asm-cv-appskel { position:absolute; inset:16px; z-index:1; box-sizing:border-box; padding:28px; display:flex; flex-direction:column; gap:18px; overflow:hidden; text-align:left; }',
       '.asm-cv-sk { display:block; border-radius:6px; background:linear-gradient(90deg, rgba(16,16,16,0.05) 0%, rgba(16,16,16,0.11) 50%, rgba(16,16,16,0.05) 100%); background-size:200% 100%; animation:asmSkelShimmer 1.5s ease-in-out infinite; }',
-      '.asm-cv-sk-topbar { display:flex; align-items:center; gap:12px; padding-bottom:16px; border-bottom:1px solid rgba(16,16,16,0.07); }',
-      '.asm-cv-sk-flex { flex:1; }',
-      '.asm-cv-sk .sk-tab, .asm-cv-sk.sk-tab { width:62px; height:12px; }',
-      '.asm-cv-sk.sk-tab--sm { width:42px; opacity:0.6; }',
-      '.asm-cv-sk.sk-btn { width:74px; height:24px; border-radius:999px; }',
-      '.asm-cv-sk-toolbar { display:flex; align-items:center; gap:8px; }',
-      '.asm-cv-sk.sk-title { width:128px; height:14px; }',
-      '.asm-cv-sk.sk-chip { width:58px; height:20px; border-radius:6px; }',
-      '.asm-cv-sk-table { display:flex; flex-direction:column; gap:14px; margin-top:2px; }',
-      '.asm-cv-sk-row { display:flex; align-items:center; gap:14px; }',
-      '.asm-cv-sk-row--head .asm-cv-sk { opacity:0.5; height:8px; }',
-      '.asm-cv-sk.sk-cell { height:10px; flex:1; }',
-      '.asm-cv-sk.sk-cell--lg { flex:2.4; }',
-      '.asm-cv-sk.sk-cell--sm { flex:0 0 56px; }',
-      '.asm-cv-sk.sk-pill { flex:0 0 44px; height:18px; border-radius:999px; }',
+      // Stat cards
+      '.asm-cv-sk-stats { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }',
+      '.asm-cv-sk-stat { border:1px solid rgba(16,16,16,0.08); border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:14px; }',
+      '.asm-cv-sk-stat-lbl { font-size:13px; line-height:18px; color:#6B6F76; }',
+      '.asm-cv-sk.sk-stat-val { width:62px; height:16px; }',
+      // Filter chips
+      '.asm-cv-sk-filters { display:flex; gap:10px; }',
+      '.asm-cv-sk.sk-filter { width:88px; height:24px; border-radius:7px; }',
+      // Data table card
+      '.asm-cv-sk-tablecard { border:1px solid rgba(16,16,16,0.08); border-radius:10px; overflow:hidden; }',
+      '.asm-cv-sk-thead, .asm-cv-sk-trow { display:grid; grid-template-columns:1.7fr 1.2fr 1.5fr 1.2fr 0.9fr; gap:16px; align-items:center; }',
+      '.asm-cv-sk-thead { padding:13px 16px; border-bottom:1px solid rgba(16,16,16,0.08); }',
+      '.asm-cv-sk-th { font-size:13px; line-height:18px; color:#6B6F76; }',
+      '.asm-cv-sk-trow { padding:14px 16px; border-bottom:1px solid rgba(16,16,16,0.05); }',
+      '.asm-cv-sk-trow:last-child { border-bottom:0; }',
+      '.asm-cv-sk.sk-cell { height:10px; }',
+      // Preview / editor sections
+      '.asm-cv-sk-section { border:1px solid rgba(16,16,16,0.08); border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:14px; }',
+      '.asm-cv-sk-sec-lbl { font-size:13px; line-height:18px; color:#6B6F76; }',
+      '.asm-cv-sk.sk-block { width:100%; height:64px; border-radius:8px; }',
       // Slide order: visual mock first, then eyebrow / headline / subhead
       // beneath. We crossfade + slide on transition for a "stepping
       // through" feel rather than a quick flip.
@@ -1851,7 +1899,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       bar.className = 'asm-topbar';
       bar.innerHTML = [
         '<div class="asm-title-cluster" id="asm-title-cluster">',
-        '  <button type="button" class="asm-title-name" id="asm-title-name">Untitled</button>',
+        '  <button type="button" class="asm-title-name" id="asm-title-name">' + escapeHtml(STATE.appTitle) + '</button>',
         '  <button type="button" class="asm-title-chev" id="asm-title-chev" aria-label="App menu">',
         '    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
         '  </button>',
@@ -2473,6 +2521,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   //    from here, so they're dimmed and non-interactive.
   // Re-applied every tick so it survives the bundle's React re-renders.
   function styleBundleTabs() {
+    // Dashboard + Portal read as disabled only while the app is loading
+    // (building); once done they become live/interactive again.
+    var loading = document.body.classList.contains('asm-phase-building');
     var btns = document.querySelectorAll('button');
     for (var i = 0; i < btns.length; i++) {
       var b = btns[i];
@@ -2480,11 +2531,18 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (name === 'Notifications') {
         if (b.style.display !== 'none') b.style.display = 'none';
       } else if (name === 'Dashboard' || name === 'Portal') {
-        if (b.getAttribute('data-asm-tab-disabled') !== '1') {
-          b.setAttribute('data-asm-tab-disabled', '1');
-          b.style.opacity = '0.4';
-          b.style.pointerEvents = 'none';
-          b.style.cursor = 'default';
+        if (loading) {
+          if (b.getAttribute('data-asm-tab-disabled') !== '1') {
+            b.setAttribute('data-asm-tab-disabled', '1');
+            b.style.opacity = '0.4';
+            b.style.pointerEvents = 'none';
+            b.style.cursor = 'default';
+          }
+        } else if (b.getAttribute('data-asm-tab-disabled') === '1') {
+          b.removeAttribute('data-asm-tab-disabled');
+          b.style.opacity = '';
+          b.style.pointerEvents = '';
+          b.style.cursor = '';
         }
       }
     }
@@ -3258,49 +3316,31 @@ document.addEventListener('DOMContentLoaded', async function() {
     ov.style.height = rect.height + 'px';
     ov.innerHTML =
       '<div class="asm-cv-appskel" aria-hidden="true">' +
-        '<div class="asm-cv-sk-topbar">' +
-          '<span class="asm-cv-sk sk-tab"></span>' +
-          '<span class="asm-cv-sk sk-tab sk-tab--sm"></span>' +
-          '<span class="asm-cv-sk sk-tab sk-tab--sm"></span>' +
-          '<span class="asm-cv-sk-flex"></span>' +
-          '<span class="asm-cv-sk sk-btn"></span>' +
-        '</div>' +
-        '<div class="asm-cv-sk-toolbar">' +
-          '<span class="asm-cv-sk sk-title"></span>' +
-          '<span class="asm-cv-sk-flex"></span>' +
-          '<span class="asm-cv-sk sk-chip"></span>' +
-          '<span class="asm-cv-sk sk-chip"></span>' +
-        '</div>' +
-        '<div class="asm-cv-sk-table">' +
-          '<div class="asm-cv-sk-row asm-cv-sk-row--head">' +
-            '<span class="asm-cv-sk sk-cell sk-cell--lg"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell sk-cell--sm"></span><span class="asm-cv-sk sk-cell sk-cell--sm"></span>' +
-          '</div>' +
-          [0,1,2,3,4,5].map(function() {
-            return '<div class="asm-cv-sk-row">' +
-              '<span class="asm-cv-sk sk-cell sk-cell--lg"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell sk-cell--sm"></span><span class="asm-cv-sk sk-pill"></span>' +
-            '</div>';
+        '<div class="asm-cv-sk-stats">' +
+          ['Total jobs', 'In progress', 'Due soon', 'Completed'].map(function(lbl) {
+            return '<div class="asm-cv-sk-stat"><span class="asm-cv-sk-stat-lbl">' + lbl + '</span><span class="asm-cv-sk sk-stat-val"></span></div>';
           }).join('') +
         '</div>' +
-      '</div>' +
-      '<div class="asm-cv-status">' + SLIDES[0].status + '</div>';
+        '<div class="asm-cv-sk-filters">' +
+          '<span class="asm-cv-sk sk-filter"></span><span class="asm-cv-sk sk-filter"></span><span class="asm-cv-sk sk-filter"></span><span class="asm-cv-sk sk-filter"></span>' +
+        '</div>' +
+        '<div class="asm-cv-sk-tablecard">' +
+          '<div class="asm-cv-sk-thead">' +
+            ['Job', 'Service type', 'Client/company', 'Current stage', 'Due'].map(function(h) { return '<span class="asm-cv-sk-th">' + h + '</span>'; }).join('') +
+          '</div>' +
+          [0, 1, 2, 3].map(function() {
+            return '<div class="asm-cv-sk-trow"><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span></div>';
+          }).join('') +
+        '</div>' +
+        '<div class="asm-cv-sk-section"><span class="asm-cv-sk-sec-lbl">Tracker preview</span><span class="asm-cv-sk sk-block"></span></div>' +
+        '<div class="asm-cv-sk-section"><span class="asm-cv-sk-sec-lbl">Stage editor</span><span class="asm-cv-sk sk-block"></span></div>' +
+      '</div>';
     document.body.appendChild(ov);
 
-    // The carousel is now a single shimmering app-layout skeleton. We only
-    // cycle the status caption beneath it so the pane reads as live build
-    // progress (no slides, arrows, or dots).
-    var idx = 0;
+    // Single shimmering app-layout skeleton — no slides, arrows, dots, or
+    // status copy. stopAuto is kept only for the finish() teardown below.
     var interval = null;
-    var statuses = SLIDES.map(function(s) { return s.status; });
-
-    function setStatus() {
-      var st = ov.querySelector('.asm-cv-status');
-      if (st) st.textContent = statuses[idx % statuses.length];
-    }
-    function stopAuto() {
-      if (interval) { clearInterval(interval); interval = null; }
-    }
-    setStatus();
-    interval = setInterval(function() { idx++; setStatus(); }, 4200);
+    function stopAuto() { if (interval) { clearInterval(interval); interval = null; } }
 
     var api = {
       el: ov,
@@ -4577,11 +4617,9 @@ document.addEventListener('DOMContentLoaded', async function() {
           document.querySelectorAll('.asm-plan-todos-end').forEach(function(el) {
             el.setAttribute('data-status', 'done');
           });
-          // Auto-name the app once it's live. The bundle's preview
-          // shows a "Time Tracker" so we mirror that here.
-          STATE.appTitle = 'Time Tracker';
+          // App is live — keep the name derived from the prompt.
           var nameBtnEl = document.getElementById('asm-title-name');
-          if (nameBtnEl) nameBtnEl.textContent = 'Time Tracker';
+          if (nameBtnEl) nameBtnEl.textContent = STATE.appTitle;
           if (window.__asmCv) window.__asmCv.finish();
           // Subtle but noticeable reveal: brief glow ring around the
           // freshly-loaded app preview.
@@ -4732,7 +4770,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       // overlay so the full-screen takeover is captured.
       STATE.phase = 'done';
       STATE.isPublished = true;
-      STATE.appTitle = 'Time Tracker';
+      STATE.appTitle = APP_NAME;
       // Mount plan v1 + advance progress to "all done" so the chat shows
       // the full plan before publishing.
       renderPlanTodosV9(shell);
@@ -4758,7 +4796,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       // get notified?" Q&A popup.
       STATE.phase = 'done';
       STATE.isPublished = true;
-      STATE.appTitle = 'Time Tracker';
+      STATE.appTitle = APP_NAME;
       STATE.notifTabActive = true;
       renderPlanTodosV9(shell);
       document.querySelectorAll('[data-step]').forEach(function(el) {
