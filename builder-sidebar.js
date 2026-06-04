@@ -69,13 +69,15 @@
   var CLOCK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#212B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>';
 
   // The app being built shows as a Draft entry under the Apps group.
-  // The label tracks the builder's own app title (read from its breadcrumb);
-  // this is just the fallback before that title is available.
-  var DRAFT_APP = 'Time Tracker';
+  // The label tracks the app name derived from the user's prompt, shared by
+  // builder.html as window.__asmAppName; falls back to "Time Tracker".
+  var DRAFT_APP = (typeof window !== 'undefined' && window.__asmAppName) ? window.__asmAppName : 'Time Tracker';
 
-  // Read the app name the builder is using, from its "Workspace / App"
+  // Read the app name the builder is using. Prefer the derived name shared
+  // by builder.html; otherwise fall back to the bundle's "Workspace / App"
   // breadcrumb in the top bar. Empty string if not found yet.
   function appTitle() {
+    if (typeof window !== 'undefined' && window.__asmAppName) return window.__asmAppName;
     var nodes = document.querySelectorAll('div, span');
     for (var i = 0; i < nodes.length; i++) {
       var el = nodes[i];

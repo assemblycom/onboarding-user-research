@@ -239,6 +239,42 @@ document.addEventListener('DOMContentLoaded', async function() {
   var PAYLOAD = parseHash();
   var BUILD_DURATION = 60000;
 
+  // ============================================================
+  // Derive a short app name from the user's prompt, so the sidebar
+  // draft entry + the topbar title reflect what's actually being built
+  // (e.g. "A client dashboard…" → "Dashboard") instead of a hardcoded
+  // "Time Tracker" / "Untitled".
+  // ============================================================
+  function deriveAppName(prompt) {
+    var p = (' ' + (prompt || '') + ' ').toLowerCase();
+    var rules = [
+      [/time ?track|timesheet|log (my )?hours/, 'Time Tracker'],
+      [/dashboard/, 'Dashboard'],
+      [/client portal|\bportal\b/, 'Client Portal'],
+      [/onboard/, 'Onboarding'],
+      [/approval/, 'Approvals'],
+      [/\brequest/, 'Requests'],
+      [/proposal/, 'Proposals'],
+      [/invoice|billing|payment/, 'Billing'],
+      [/inventory|stock/, 'Inventory'],
+      [/ticket|help ?desk|support/, 'Support Desk'],
+      [/\bcrm\b|contact|lead/, 'CRM'],
+      [/project/, 'Projects'],
+      [/assistant|chatbot|\bai\b/, 'AI Assistant'],
+      [/track/, 'Tracker']
+    ];
+    for (var i = 0; i < rules.length; i++) { if (rules[i][0].test(p)) return rules[i][1]; }
+    // Fallback: Title-case the first couple of meaningful words.
+    var stop = { a:1, an:1, the:1, my:1, our:1, build:1, me:1, create:1, make:1, app:1, with:1, for:1, that:1, to:1 };
+    var words = (prompt || '').replace(/[^a-zA-Z0-9 ]/g, ' ').trim().split(/\s+/)
+      .filter(function(w) { return w && !stop[w.toLowerCase()]; }).slice(0, 2);
+    if (words.length) return words.map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+    return 'My App';
+  }
+  var APP_NAME = deriveAppName(PAYLOAD.prompt);
+  // Shared with the injected sidebar script (builder-sidebar.js).
+  try { window.__asmAppName = APP_NAME; } catch (e) {}
+
   // Bundle is a React app — synthetic .click() doesn't fire its
   // delegated handlers. Reach into the fiber's props and call onClick
   // directly with a minimal synthetic event. Hoisted to IIFE scope so
@@ -321,7 +357,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     followupBusy: false,
     followupIdx: 0,
     userChatWidth: null,         // populated on first transition out of QA
-    appTitle: 'Untitled',
+    appTitle: APP_NAME,
     appIcon: 'clock',            // sidebar icon key
     isPublished: false,
     appVersion: 0,               // increments on each publish
@@ -444,7 +480,10 @@ document.addEventListener('DOMContentLoaded', async function() {
       // The Editor/Live toggle is hidden across QA/building AND in done
       // until first publish (nothing is "live" before that). A separate
       // rule keyed off `body:not(.asm-published)` handles the toggle.
-      'body.asm-phase-qa div[style*="display: flex"][style*="align-items: center"][style*="gap: 4px"]:has(> button[style*="font-size: 12px"]), body.asm-phase-building div[style*="display: flex"][style*="align-items: center"][style*="gap: 4px"]:has(> button[style*="font-size: 12px"]) { opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }',
+      // Hide the Dashboard/Portal tab cluster during Q&A only. During the
+      // build we keep it VISIBLE but disabled (see styleBundleTabs) so the
+      // app chrome reads as "loading", then it enables once done.
+      'body.asm-phase-qa div[style*="display: flex"][style*="align-items: center"][style*="gap: 4px"]:has(> button[style*="font-size: 12px"]) { opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }',
       'body:not(.asm-published) div[style*="background: rgb(242, 243, 246)"][style*="border-radius: 7px"] { opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }',
       // Dashboard/Portal/Notifications active (and hover) tab pill — use the
       // product\'s approved gray (#eff1f4) in place of the bundle\'s warm tone.
@@ -987,10 +1026,48 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.asm-plan-version-badge--current { background:rgba(125,164,255,0.18); color:#2B4D9C; }',
       '.asm-plan-version-badge--approved { background:rgba(17,91,59,0.10); color:#115B3B; }',
 
-      // ── Recap chips (after Q&A done) ─────────────────────
-      '.asm-recap { display:flex; flex-direction:column; gap:6px; align-self:stretch; }',
-      '.asm-recap-row { display:flex; align-items:center; gap:8px; font-size:12px; color:#6B6F76; padding:6px 10px; background:#F8F9FB; border-radius:8px; }',
-      '.asm-recap-row b { color:#101010; font-weight:500; }',
+      // ── Todos timeline (re-skin of the V4 plan-todos) ───────────
+      // The checklist becomes a single-green timeline: a head node in
+      // the header, a rail that fills + darkens as each step finishes,
+      // and a terminal "App built" node that resolves on completion.
+      // One green hue (#115B3B) at opacity steps; text-primary #212B36,
+      // text-secondary #6B6F76. Rail is centered under the head node.
+      '.asm-plan-todos--tl { background:#FFFFFF; }',
+      '.asm-plan-todos--tl .asm-plan-todos-icon { width:14px; height:14px; border:2px solid #115B3B; border-radius:50%; box-sizing:border-box; }',
+      '.asm-plan-todos--tl .asm-plan-todos-icon svg { display:none; }',
+      '.asm-plan-todos--tl .asm-plan-todos-label { color:#212B36; }',
+      '.asm-plan-todos--tl .asm-plan-todos-check { display:none; }',
+      '.asm-plan-todos--tl .asm-plan-todos-row { margin:0 -8px 0 6px; padding:8px 8px 8px 16px; border-left:2px solid transparent; border-radius:0; }',
+      '.asm-plan-todos--tl .asm-plan-todos-row + .asm-plan-todos-row { border-top:0; }',
+      '.asm-plan-todos--tl .asm-plan-todos-row[data-status="queued"] { border-left-color:rgba(17,91,59,0.22); }',
+      '.asm-plan-todos--tl .asm-plan-todos-row[data-status="inprogress"] { border-left-color:rgba(17,91,59,0.55); background:rgba(17,91,59,0.06); }',
+      '.asm-plan-todos--tl .asm-plan-todos-row[data-status="inprogress"]::before { background-image:linear-gradient(105deg, transparent 36%, rgba(17,91,59,0.20) 50%, transparent 64%); }',
+      '.asm-plan-todos--tl .asm-plan-todos-row[data-status="done"] { border-left-color:rgba(17,91,59,0.9); }',
+      '.asm-plan-todos--tl .asm-plan-todos-row-title { color:#212B36; }',
+      '.asm-plan-todos--tl .asm-plan-todos-row-detail { color:#6B6F76; }',
+      '.asm-plan-todos--tl .asm-plan-todos-row[data-status="queued"] .asm-plan-todos-row-title { color:#6B6F76; }',
+      '.asm-plan-todos--tl .asm-plan-todos-row[data-status="done"] .asm-plan-todos-row-title { color:#212B36; }',
+      '.asm-plan-todos--tl .asm-plan-todos-row--rich[data-status="done"] .asm-plan-todos-row-detail { color:#6B6F76; }',
+      // Terminal "App built" node — rail ends at the last step; node sits
+      // below with a matching gap (symmetric), filling green + check.
+      '.asm-plan-todos--tl .asm-plan-todos-end { position:relative; border-left:0 !important; background:transparent !important; padding:10px 8px 10px 16px; align-items:center; }',
+      '.asm-plan-todos--tl .asm-plan-todos-end::before { display:none !important; }',
+      '.asm-plan-todos--tl .asm-plan-todos-endnode { position:absolute; left:-6px; top:50%; transform:translateY(-50%); width:14px; height:14px; border-radius:50%; border:2px solid rgba(17,91,59,0.22); background:#fff; box-sizing:border-box; display:grid; place-items:center; transition:background 0.25s ease, border-color 0.25s ease; }',
+      '.asm-plan-todos--tl .asm-plan-todos-end[data-status="done"] .asm-plan-todos-endnode { background:#115B3B; border-color:#115B3B; }',
+      '.asm-plan-todos--tl .asm-plan-todos-endcheck { width:8px; height:8px; opacity:0; transition:opacity 0.2s ease; }',
+      '.asm-plan-todos--tl .asm-plan-todos-end[data-status="done"] .asm-plan-todos-endcheck { opacity:1; }',
+
+      // ── Q&A recap (after Q&A done) — "Summarizes questions" ──────
+      // One grouped gray card: each item stacks the question (primary)
+      // over the chosen answer (secondary). Mirrors the Figma
+      // "Summarizes questions" component (fills, 12px/16px padding, 12px
+      // item gap, 2px q/a gap, body/sm type), adapted to this project's
+      // agent-side card convention (squared top-left tail, like the
+      // Requirements card).
+      '.asm-recap { display:flex; flex-direction:column; gap:12px; align-self:stretch; background:#F8F9FB; padding:12px 16px; border-radius:0 8px 8px 8px; }',
+      '.asm-recap-item { display:flex; flex-direction:column; gap:2px; }',
+      '.asm-recap-q { font-size:14px; line-height:22px; color:#212B36; }',
+      '.asm-recap-a { font-size:13px; line-height:21px; color:#6B6F76; }',
 
       // ── Requirements card (AI output in the thread; approve here) ──
       // White bordered card matching the Figma "Requirements" component.
@@ -1001,15 +1078,42 @@ document.addEventListener('DOMContentLoaded', async function() {
       '@keyframes asmReqIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }',
       '.asm-req-title { font-size:14px; font-weight:500; line-height:22px; color:#212B36; }',
       '.asm-req-body { position:relative; font-size:13px; line-height:21px; color:#212B36; overflow:hidden; }',
-      '.asm-req-card:not(.expanded) .asm-req-body { max-height:300px; }',
-      '.asm-req-card:not(.expanded) .asm-req-body::after { content:""; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 92%); pointer-events:none; }',
+      // The Requirements card fills the available reading pane instead of
+      // sitting in a short box above empty space — we want reviewers to
+      // read the whole thing and sign off. The message wrapper + card +
+      // body flex-grow to claim all the height between the top and the
+      // approve composer (.asm-scroll--reqfill reclaims the normal wide
+      // 200px bottom dead-zone). The fade + "Show more" only appear when
+      // the plan is genuinely taller than that filled area
+      // (.asm-req-overflow, measured in JS). Expanding lets the card grow
+      // past the viewport and the thread scrolls.
+      '.asm-scroll--reqfill { padding-bottom:24px !important; }',
+      '.asm-scroll--reqfill .asm-req-msg { flex:1 1 auto; min-height:0; display:flex; }',
+      '.asm-scroll--reqfill .asm-req-msg .asm-req-card { flex:1 1 auto; min-height:0; }',
+      '.asm-req-card:not(.expanded) .asm-req-body { flex:1 1 auto; min-height:0; }',
+      '.asm-scroll--reqfill .asm-req-msg.asm-req-msg--expanded { flex:0 0 auto; }',
+      '.asm-req-card.expanded .asm-req-body { overflow:visible; }',
+      // Once the build starts (and after it finishes), the Requirements
+      // card is no longer the focus: it stops filling the pane and settles
+      // into the chat as a compact card (~5-10 lines), with the Build app
+      // timeline sitting directly below it. Overrides the fill rules above
+      // so there is no squish/overlap when the timeline mounts.
+      'body.asm-phase-building .asm-req-msg, body.asm-phase-done .asm-req-msg { flex:0 0 auto !important; display:block !important; }',
+      'body.asm-phase-building .asm-req-msg .asm-req-card, body.asm-phase-done .asm-req-msg .asm-req-card { flex:0 0 auto !important; }',
+      // Compact while collapsed; "Show more" lifts the clamp to reveal the
+      // full requirements list (scoped to :not(.expanded) so expanding wins).
+      'body.asm-phase-building .asm-req-card:not(.expanded) .asm-req-body, body.asm-phase-done .asm-req-card:not(.expanded) .asm-req-body { flex:0 0 auto !important; min-height:126px; max-height:210px; overflow:hidden !important; }',
+      'body.asm-phase-building .asm-req-card:not(.expanded) .asm-req-body::after, body.asm-phase-done .asm-req-card:not(.expanded) .asm-req-body::after { content:""; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 92%); pointer-events:none; }',
+      'body.asm-phase-building .asm-req-card:not(.expanded) .asm-req-showmore, body.asm-phase-done .asm-req-card:not(.expanded) .asm-req-showmore { display:inline-block !important; }',
+      '.asm-req-card.asm-req-overflow:not(.expanded) .asm-req-body::after { content:""; position:absolute; left:0; right:0; bottom:0; height:56px; background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #FFFFFF 92%); pointer-events:none; }',
       '.asm-req-body > *:first-child { margin-top:0; }',
       '.asm-req-body p { margin:0 0 8px; }',
       '.asm-req-body p:last-child { margin-bottom:0; }',
       '.asm-req-h { font-weight:500; color:#212B36; margin:14px 0 2px; }',
       '.asm-req-body ul { margin:0 0 8px; padding-left:18px; }',
       '.asm-req-body li { margin:3px 0; }',
-      '.asm-req-showmore { align-self:flex-start; background:none; border:0; padding:0; font-family:inherit; font-size:14px; line-height:22px; color:#0C41BB; cursor:pointer; }',
+      '.asm-req-showmore { display:none; align-self:flex-start; background:none; border:0; padding:0; font-family:inherit; font-size:14px; line-height:22px; color:#0C41BB; cursor:pointer; }',
+      '.asm-req-card.asm-req-overflow .asm-req-showmore { display:inline-block; }',
       '.asm-req-showmore:hover { text-decoration:underline; }',
 
       // ── Plan list ────────────────────────────────────────
@@ -1275,6 +1379,39 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.asm-carousel::before { content: ""; position: absolute; inset: 16px; background: #fff; border-radius: 12px; box-shadow: 0 1px 3px rgba(16,16,16,0.04), 0 8px 24px rgba(16,16,16,0.05); z-index: 0; pointer-events: none; }',
       '.asm-carousel > * { position: relative; z-index: 1; }',
       '.asm-carousel.hide { opacity:0; pointer-events:none; }',
+      // ── Build shimmer skeleton ───────────────────────────────────
+      // While the app builds, the right pane shows a shimmering wireframe
+      // of the app being assembled (topbar tabs → toolbar → data table)
+      // so the user sees the layout take shape, with a live status caption
+      // beneath. Replaces the old marketing carousel.
+      // Disabled Dashboard/Portal tab placeholders during loading. Sits
+      // above the topbar (z>150) so it's visible over our opaque topbar.
+      '.asm-loading-tabs { position:fixed; z-index:160; display:flex; align-items:center; gap:6px; pointer-events:none; }',
+      '.asm-loading-tab { font-family:var(--font-sans, system-ui); font-size:12px; font-weight:500; line-height:1; padding:5px 11px; border-radius:6px; color:#A2A8AF; }',
+      '.asm-loading-tab.active { background:#F1F1ED; color:#7E848B; }',
+      // Fills the white preview card (matches .asm-carousel::before inset).
+      '.asm-cv-appskel { position:absolute; inset:16px; z-index:1; box-sizing:border-box; padding:28px; display:flex; flex-direction:column; gap:18px; overflow:hidden; text-align:left; }',
+      '.asm-cv-sk { display:block; border-radius:6px; background:linear-gradient(90deg, rgba(16,16,16,0.05) 0%, rgba(16,16,16,0.11) 50%, rgba(16,16,16,0.05) 100%); background-size:200% 100%; animation:asmSkelShimmer 1.5s ease-in-out infinite; }',
+      // Stat cards
+      '.asm-cv-sk-stats { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }',
+      '.asm-cv-sk-stat { border:1px solid rgba(16,16,16,0.08); border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:14px; }',
+      '.asm-cv-sk-stat-lbl { font-size:13px; line-height:18px; color:#6B6F76; }',
+      '.asm-cv-sk.sk-stat-val { width:62px; height:16px; }',
+      // Filter chips
+      '.asm-cv-sk-filters { display:flex; gap:10px; }',
+      '.asm-cv-sk.sk-filter { width:88px; height:24px; border-radius:7px; }',
+      // Data table card
+      '.asm-cv-sk-tablecard { border:1px solid rgba(16,16,16,0.08); border-radius:10px; overflow:hidden; }',
+      '.asm-cv-sk-thead, .asm-cv-sk-trow { display:grid; grid-template-columns:1.7fr 1.2fr 1.5fr 1.2fr 0.9fr; gap:16px; align-items:center; }',
+      '.asm-cv-sk-thead { padding:13px 16px; border-bottom:1px solid rgba(16,16,16,0.08); }',
+      '.asm-cv-sk-th { font-size:13px; line-height:18px; color:#6B6F76; }',
+      '.asm-cv-sk-trow { padding:14px 16px; border-bottom:1px solid rgba(16,16,16,0.05); }',
+      '.asm-cv-sk-trow:last-child { border-bottom:0; }',
+      '.asm-cv-sk.sk-cell { height:10px; }',
+      // Preview / editor sections
+      '.asm-cv-sk-section { border:1px solid rgba(16,16,16,0.08); border-radius:10px; padding:16px; display:flex; flex-direction:column; gap:14px; }',
+      '.asm-cv-sk-sec-lbl { font-size:13px; line-height:18px; color:#6B6F76; }',
+      '.asm-cv-sk.sk-block { width:100%; height:64px; border-radius:8px; }',
       // Slide order: visual mock first, then eyebrow / headline / subhead
       // beneath. We crossfade + slide on transition for a "stepping
       // through" feel rather than a quick flip.
@@ -1797,7 +1934,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       bar.className = 'asm-topbar';
       bar.innerHTML = [
         '<div class="asm-title-cluster" id="asm-title-cluster">',
-        '  <button type="button" class="asm-title-name" id="asm-title-name">Untitled</button>',
+        '  <button type="button" class="asm-title-name" id="asm-title-name">' + escapeHtml(STATE.appTitle) + '</button>',
         '  <button type="button" class="asm-title-chev" id="asm-title-chev" aria-label="App menu">',
         '    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
         '  </button>',
@@ -2527,8 +2664,28 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
   }
+  // Topbar tab treatment for the prototype preview:
+  //  • Remove the Notifications tab (to the right of Portal) entirely.
+  //  • Dashboard stays the active view, but Dashboard + Portal read as
+  //    disabled — the research prototype isn't meant to switch app views
+  //    from here, so they're dimmed and non-interactive.
+  // Re-applied every tick so it survives the bundle's React re-renders.
+  function styleBundleTabs() {
+    // Remove the Notifications tab (right of Portal) from the bundle topbar.
+    // Dashboard/Portal disabled-during-load is handled by ensureLoadingTabs;
+    // the bundle's real tabs show (enabled) once the topbar goes transparent
+    // in the done phase.
+    var btns = document.querySelectorAll('button');
+    for (var i = 0; i < btns.length; i++) {
+      var b = btns[i];
+      if ((b.textContent || '').trim() === 'Notifications') {
+        if (b.style.display !== 'none') b.style.display = 'none';
+      }
+    }
+  }
   function syncNotifPanel() {
     attachTabClickListeners();
+    styleBundleTabs();
     var active = isNotifTabActive();
     STATE.notifTabActive = active;
     document.body.classList.toggle('asm-notif-tab', active);
@@ -3111,7 +3268,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Recap chips
     var recap = '<div class="asm-recap">' + STATE.qaAnswers.map(function(a, i) {
-      return '<div class="asm-recap-row"><b>Q' + (i + 1) + '</b> · ' + a + '</div>';
+      var q = QA_QUESTIONS[i] ? QA_QUESTIONS[i].question : ('Question ' + (i + 1));
+      return '<div class="asm-recap-item"><div class="asm-recap-q">' + escapeHtml(q) + '</div><div class="asm-recap-a">' + escapeHtml(a) + '</div></div>';
     }).join('') + '</div>';
     appendMsg(scroll, 'agent', recap, 'recap');
 
@@ -3293,89 +3451,32 @@ document.addEventListener('DOMContentLoaded', async function() {
     ov.style.width = rect.width + 'px';
     ov.style.height = rect.height + 'px';
     ov.innerHTML =
-      '<div class="asm-cv-stage">' +
-      SLIDES.map(function(s, i) {
-        return '<div class="asm-cv-slide' + (i === 0 ? ' active' : '') + '" data-i="' + i + '">' +
-               '<div class="asm-cv-eyebrow">' + s.eyebrow + '</div>' +
-               '<div class="asm-cv-headline">' + s.headline + '</div>' +
-               '<div class="asm-cv-subhead">' + s.subhead + '</div>' +
-               buildSlideMock(s.mock) +
-               '</div>';
-      }).join('') +
-      '</div>' +
-      '<div class="asm-cv-nav">' +
-        '<button type="button" class="asm-cv-arrow" id="asm-cv-prev" aria-label="Previous">' +
-          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>' +
-        '</button>' +
-        '<div class="asm-cv-dots">' + SLIDES.map(function(_, i) { return '<button type="button" class="asm-cv-dot' + (i === 0 ? ' active' : '') + '" data-i="' + i + '" aria-label="Slide ' + (i + 1) + '"><span class="asm-cv-dot-fill"></span></button>'; }).join('') + '</div>' +
-        '<button type="button" class="asm-cv-arrow" id="asm-cv-next" aria-label="Next">' +
-          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>' +
-        '</button>' +
-      '</div>' +
-      '<div class="asm-cv-status">' + SLIDES[0].status + '</div>';
+      '<div class="asm-cv-appskel" aria-hidden="true">' +
+        '<div class="asm-cv-sk-stats">' +
+          ['Total jobs', 'In progress', 'Due soon', 'Completed'].map(function(lbl) {
+            return '<div class="asm-cv-sk-stat"><span class="asm-cv-sk-stat-lbl">' + lbl + '</span><span class="asm-cv-sk sk-stat-val"></span></div>';
+          }).join('') +
+        '</div>' +
+        '<div class="asm-cv-sk-filters">' +
+          '<span class="asm-cv-sk sk-filter"></span><span class="asm-cv-sk sk-filter"></span><span class="asm-cv-sk sk-filter"></span><span class="asm-cv-sk sk-filter"></span>' +
+        '</div>' +
+        '<div class="asm-cv-sk-tablecard">' +
+          '<div class="asm-cv-sk-thead">' +
+            ['Job', 'Service type', 'Client/company', 'Current stage', 'Due'].map(function(h) { return '<span class="asm-cv-sk-th">' + h + '</span>'; }).join('') +
+          '</div>' +
+          [0, 1, 2, 3].map(function() {
+            return '<div class="asm-cv-sk-trow"><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span><span class="asm-cv-sk sk-cell"></span></div>';
+          }).join('') +
+        '</div>' +
+        '<div class="asm-cv-sk-section"><span class="asm-cv-sk-sec-lbl">Tracker preview</span><span class="asm-cv-sk sk-block"></span></div>' +
+        '<div class="asm-cv-sk-section"><span class="asm-cv-sk-sec-lbl">Stage editor</span><span class="asm-cv-sk sk-block"></span></div>' +
+      '</div>';
     document.body.appendChild(ov);
 
-    var idx = 0;
-    var autoMs = 5500;
+    // Single shimmering app-layout skeleton — no slides, arrows, dots, or
+    // status copy. stopAuto is kept only for the finish() teardown below.
     var interval = null;
-    var userInteracted = false;
-
-    function render(newIdx, dir) {
-      var prevIdx = idx;
-      idx = (newIdx + SLIDES.length) % SLIDES.length;
-      ov.querySelectorAll('.asm-cv-slide').forEach(function(el) {
-        var i = parseInt(el.getAttribute('data-i'), 10);
-        el.classList.remove('active', 'exit-left');
-        if (i === idx) {
-          el.classList.add('active');
-        } else if (dir === 'next' && i === prevIdx) {
-          el.classList.add('exit-left');
-        }
-      });
-      ov.querySelectorAll('.asm-cv-dot').forEach(function(el, i) {
-        el.classList.toggle('active', i === idx);
-      });
-      // Restart the progress-fill animation on the new active dot so
-      // it always plays from 0 → 100% (whether reached by auto-advance,
-      // arrow click, or jumping to a specific dot).
-      var activeDot = ov.querySelector('.asm-cv-dot.active');
-      var fill = activeDot ? activeDot.querySelector('.asm-cv-dot-fill') : null;
-      if (fill) {
-        fill.style.animation = 'none';
-        // Force reflow so the next assignment re-triggers the animation.
-        void fill.offsetWidth;
-        fill.style.animation = '';
-      }
-      var st = ov.querySelector('.asm-cv-status');
-      if (st) st.textContent = SLIDES[idx].status;
-    }
-
-    function startAuto() {
-      if (interval) clearInterval(interval);
-      interval = setInterval(function() { render(idx + 1, 'next'); }, autoMs);
-    }
-    function stopAuto() {
-      if (interval) { clearInterval(interval); interval = null; }
-    }
-    function resetAuto() { startAuto(); }
-
-    ov.querySelector('#asm-cv-prev').addEventListener('click', function() {
-      render(idx - 1, 'prev');
-      resetAuto();
-    });
-    ov.querySelector('#asm-cv-next').addEventListener('click', function() {
-      render(idx + 1, 'next');
-      resetAuto();
-    });
-    ov.querySelectorAll('.asm-cv-dot').forEach(function(d) {
-      d.addEventListener('click', function() {
-        var target = parseInt(d.getAttribute('data-i'), 10);
-        render(target, target > idx ? 'next' : 'prev');
-        resetAuto();
-      });
-    });
-
-    startAuto();
+    function stopAuto() { if (interval) { clearInterval(interval); interval = null; } }
 
     var api = {
       el: ov,
@@ -3387,6 +3488,29 @@ document.addEventListener('DOMContentLoaded', async function() {
     };
     window.__asmCv = api;
     return api;
+  }
+
+  // Disabled Dashboard/Portal tab placeholders shown while the app loads.
+  // The real bundle tabs sit under our opaque topbar during build (only the
+  // done-phase topbar goes transparent), so we render our own — anchored to
+  // the preview pane's left edge, above the topbar — and remove them once
+  // the build finishes so the real, now-enabled tabs take over.
+  function ensureLoadingTabs(app) {
+    var el = document.getElementById('asm-loading-tabs');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'asm-loading-tabs';
+      el.className = 'asm-loading-tabs';
+      el.innerHTML = '<span class="asm-loading-tab active">Dashboard</span><span class="asm-loading-tab">Portal</span>';
+      document.body.appendChild(el);
+    }
+    var r = app.getBoundingClientRect();
+    el.style.left = (r.left + 12) + 'px';
+    el.style.top = '7px';
+  }
+  function removeLoadingTabs() {
+    var el = document.getElementById('asm-loading-tabs');
+    if (el && el.parentNode) el.parentNode.removeChild(el);
   }
 
   // ============================================================
@@ -3689,7 +3813,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     ensurePlanItems();
     var scroll = shell.querySelector('#asm-scroll');
     var recap = '<div class="asm-recap">' + STATE.qaAnswers.map(function(a, i) {
-      return '<div class="asm-recap-row"><b>Q' + (i + 1) + '</b> · ' + escapeHtml(a) + '</div>';
+      var q = QA_QUESTIONS[i] ? QA_QUESTIONS[i].question : ('Question ' + (i + 1));
+      return '<div class="asm-recap-item"><div class="asm-recap-q">' + escapeHtml(q) + '</div><div class="asm-recap-a">' + escapeHtml(a) + '</div></div>';
     }).join('') + '</div>';
     appendMsg(scroll, 'agent', recap, 'recap');
     // Stream a Codex/Claude-style reasoning block (shimmering header +
@@ -4127,10 +4252,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Dispatch — called every tick. No-op outside the plan phase
   // (and tears down stale UI when leaving the phase).
   function renderPlan(shell) {
-    // During 'building' we deliberately keep the plan UI mounted so it
-    // can morph into a progress component (driven by updateBuildProgress).
-    // Only tear down when leaving plan AND build entirely (qa or done).
-    if (STATE.phase === 'building') return;
+    // During 'building' AND 'done' we keep the Todos timeline mounted —
+    // it carries the build progress and the terminal "App built" node, so
+    // it should stay as the completion record. Only tear down on reset (qa).
+    if (STATE.phase === 'building' || STATE.phase === 'done') return;
     if (STATE.phase !== 'plan') {
       removePlanTodosV9();
       removePlanSkeleton();
@@ -4229,22 +4354,44 @@ document.addEventListener('DOMContentLoaded', async function() {
         '<button type="button" class="asm-req-showmore" id="asm-req-showmore">Show more</button>' +
       '</div>';
     var msgEl = appendMsg(scroll, 'agent', html, 'requirements');
-    if (msgEl) msgEl.classList.add('asm-msg-agent--fill');
+    if (msgEl) msgEl.classList.add('asm-msg-agent--fill', 'asm-req-msg');
+    // Flag the thread so the card flex-fills the reading pane (and the
+    // wide-mode 200px bottom dead-zone is reclaimed).
+    scroll.classList.add('asm-scroll--reqfill');
 
     var card = document.getElementById('asm-req-card');
     var toggle = document.getElementById('asm-req-showmore');
+    var body = document.getElementById('asm-req-body');
+
+    // Only surface the fade + "Show more" when the requirements actually
+    // overflow the filled reading area. If the whole plan fits, there's
+    // nothing to hide — no premature cutoff. Re-measured on resize and
+    // after layout settles since the fill height is flex-derived.
+    function measureReqOverflow() {
+      if (!card || !body || card.classList.contains('expanded')) return;
+      var overflowing = (body.scrollHeight - body.clientHeight) > 2;
+      card.classList.toggle('asm-req-overflow', overflowing);
+    }
+    requestAnimationFrame(measureReqOverflow);
+    setTimeout(measureReqOverflow, 120);
+    window.addEventListener('resize', measureReqOverflow);
+
     if (toggle && card) {
+      // One-way reveal: "Show more" expands the full plan and is then
+      // removed (no "Show less"). The auto-scroll pins the "Requirements"
+      // title near the top of the reading pane — enough to reveal more of
+      // the plan, but never so far that the title scrolls out of view.
+      // The reader takes it from there manually.
       toggle.addEventListener('click', function() {
-        var expanding = !card.classList.contains('expanded');
-        card.classList.toggle('expanded', expanding);
-        toggle.textContent = expanding ? 'Show less' : 'Show more';
-        if (expanding) {
-          // Auto-scroll so the now fully-expanded plan is visible.
-          requestAnimationFrame(function() {
-            var sc = shell.querySelector('#asm-scroll');
-            if (sc) sc.scrollTop = sc.scrollHeight;
-          });
-        }
+        card.classList.add('expanded');
+        if (msgEl) msgEl.classList.add('asm-req-msg--expanded');
+        toggle.style.display = 'none';
+        requestAnimationFrame(function() {
+          var sc = shell.querySelector('#asm-scroll');
+          if (!sc) return;
+          var delta = card.getBoundingClientRect().top - sc.getBoundingClientRect().top;
+          sc.scrollTo({ top: Math.max(0, sc.scrollTop + delta - 12), behavior: 'smooth' });
+        });
       });
     }
     scrollToBottom(scroll);
@@ -4276,14 +4423,21 @@ document.addEventListener('DOMContentLoaded', async function() {
           '</div>' +
         '</div>';
       }).join('');
+      // Terminal "App built" node — caps the timeline, lights up green
+      // with a check when the build finishes (see updateBuildProgress).
+      var endRow =
+        '<div class="asm-plan-todos-row asm-plan-todos-end" data-end="1" data-status="pending">' +
+          '<span class="asm-plan-todos-endnode"><svg class="asm-plan-todos-endcheck" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' +
+          '<div class="asm-plan-todos-row-text"><span class="asm-plan-todos-row-title">App built</span></div>' +
+        '</div>';
       var html =
-        '<div class="asm-plan-todos" id="' + panelId + '">' +
+        '<div class="asm-plan-todos asm-plan-todos--tl" id="' + panelId + '">' +
           '<div class="asm-plan-todos-header">' +
-            '<span class="asm-plan-todos-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>' +
-            '<span class="asm-plan-todos-label">Build Plan</span>' +
+            '<span class="asm-plan-todos-icon"></span>' +
+            '<span class="asm-plan-todos-label">Build app</span>' +
             '<button type="button" class="asm-plan-todos-toggle" aria-label="Collapse"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>' +
           '</div>' +
-          '<div class="asm-plan-todos-body">' + rows + '</div>' +
+          '<div class="asm-plan-todos-body">' + rows + endRow + '</div>' +
         '</div>';
       var msgEl = appendMsg(scroll, 'agent', html, flagKey);
       if (msgEl) msgEl.classList.add('asm-msg-agent--fill');
@@ -4602,7 +4756,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       // Build state: carousel + thinking labels + done resolution
       if (STATE.phase === 'building') {
         var app = findBundleApp();
-        if (app) ensureCarousel(app);
+        if (app) { ensureCarousel(app); ensureLoadingTabs(app); }
         updateBuildProgress();
 
         // Use buildElapsed() so pause freezes the entire build clock —
@@ -4618,12 +4772,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (elapsed >= BUILD_DURATION && !buildAppliedDone) {
           buildAppliedDone = true;
           STATE.phase = 'done';
-          // Auto-name the app once it's live. The bundle's preview
-          // shows a "Time Tracker" so we mirror that here.
-          STATE.appTitle = 'Time Tracker';
+          // Light up the terminal "App built" node on the Todos timeline.
+          document.querySelectorAll('.asm-plan-todos-end').forEach(function(el) {
+            el.setAttribute('data-status', 'done');
+          });
+          // App is live — keep the name derived from the prompt.
           var nameBtnEl = document.getElementById('asm-title-name');
-          if (nameBtnEl) nameBtnEl.textContent = 'Time Tracker';
+          if (nameBtnEl) nameBtnEl.textContent = STATE.appTitle;
           if (window.__asmCv) window.__asmCv.finish();
+          // Drop the loading tab placeholders so the bundle's now-enabled
+          // Dashboard/Portal tabs show through the (now transparent) topbar.
+          removeLoadingTabs();
           // Subtle but noticeable reveal: brief glow ring around the
           // freshly-loaded app preview.
           var appEl = findBundleApp();
@@ -4703,7 +4862,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Q&A recap (matches the natural enterPlanPhase output).
     var recapHtml = '<div class="asm-recap">' + STATE.qaAnswers.map(function(a, i) {
-      return '<div class="asm-recap-row"><b>Q' + (i + 1) + '</b> · ' + escapeHtml(a) + '</div>';
+      var q = QA_QUESTIONS[i] ? QA_QUESTIONS[i].question : ('Question ' + (i + 1));
+      return '<div class="asm-recap-item"><div class="asm-recap-q">' + escapeHtml(q) + '</div><div class="asm-recap-a">' + escapeHtml(a) + '</div></div>';
     }).join('') + '</div>';
     appendMsg(scroll, 'agent', recapHtml, 'recap');
     appendMsg(scroll, 'agent', "Here's the plan I drafted — review before I build.", 'plan-intro');
@@ -4772,7 +4932,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       // overlay so the full-screen takeover is captured.
       STATE.phase = 'done';
       STATE.isPublished = true;
-      STATE.appTitle = 'Time Tracker';
+      STATE.appTitle = APP_NAME;
       // Mount plan v1 + advance progress to "all done" so the chat shows
       // the full plan before publishing.
       renderPlanTodosV9(shell);
@@ -4798,7 +4958,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       // get notified?" Q&A popup.
       STATE.phase = 'done';
       STATE.isPublished = true;
-      STATE.appTitle = 'Time Tracker';
+      STATE.appTitle = APP_NAME;
       STATE.notifTabActive = true;
       renderPlanTodosV9(shell);
       document.querySelectorAll('[data-step]').forEach(function(el) {
