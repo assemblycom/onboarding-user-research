@@ -47,7 +47,11 @@
     '.asm-sb .open-portal{display:flex;align-items:center;gap:6px;height:32px;padding:0 11px;border:1px solid var(--border);background:#fff;border-radius:999px;font-size:12px;font-weight:500;color:var(--text);cursor:pointer;font-family:inherit;transition:background .12s;}' +
     '.asm-sb .open-portal:hover{background:var(--bg-hover);}' +
     // The bundle's own design-system jump-out link duplicates our nav now.
-    '#asm-components-link{display:none !important;}';
+    '#asm-components-link{display:none !important;}' +
+    // Off-white cover that hides the bundle's default render until our sidebar
+    // is in place — prevents the "BrandMages" flash on load.
+    '#asm-load-cover{position:fixed;inset:0;z-index:9998;background:#FBFBF5;transition:opacity .25s ease;}' +
+    '#asm-load-cover.asm-hide{opacity:0;pointer-events:none;}';
 
   function ensureStyle() {
     if (document.getElementById(STYLE_ID)) return;
@@ -171,13 +175,27 @@
     nodes.forEach(function (t) { t.nodeValue = t.nodeValue.split('BrandMages').join(co); });
   }
 
+  function ensureCover() {
+    if (document.getElementById('asm-load-cover')) return;
+    var c = document.createElement('div');
+    c.id = 'asm-load-cover';
+    document.body.appendChild(c);
+  }
+  function removeCover() {
+    var c = document.getElementById('asm-load-cover');
+    if (!c || c.classList.contains('asm-hide')) return;
+    c.classList.add('asm-hide');
+    setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 280);
+  }
+
   function apply() {
     ensureStyle();
     rebrandText();
     var sb = findBundleSidebar();
-    if (!sb) return;
+    if (!sb) { ensureCover(); return; }
     // Already replaced and still intact — just keep the draft entry in sync.
-    if (sb.getAttribute(MARK) === '1' && sb.querySelector('.asm-sb')) { syncDraft(sb); return; }
+    if (sb.getAttribute(MARK) === '1' && sb.querySelector('.asm-sb')) { syncDraft(sb); removeCover(); return; }
+    ensureCover();
     sb.setAttribute(MARK, '1');
     // Neutralise the bundle's inline chrome so our sidebar owns the column.
     sb.style.padding = '0';
@@ -191,8 +209,9 @@
     // Reaching the builder means a prompt was entered → publish is in-progress.
     if (window.ftuxMarkPublishProgress) window.ftuxMarkPublishProgress();
     syncDraft(sb);
+    removeCover();
   }
 
-  setInterval(apply, 200);
+  setInterval(apply, 60);
   apply();
 })();
