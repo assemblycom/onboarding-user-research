@@ -47,17 +47,20 @@
     /* Editor */
     .editor { flex: 1; display: flex; flex-direction: column; min-width: 0; }
     .editor-top { display: flex; align-items: center; justify-content: space-between; height: 52px; flex-shrink: 0; padding: 0 18px 0 24px; border-bottom: 1px solid var(--border); gap: 16px; }
-    .ed-tabs { display: inline-flex; align-items: center; gap: 3px; background: #fff; border: 1px solid var(--border); border-radius: 9px; padding: 3px; }
-    .ed-tab { font-size: 13px; color: var(--muted); cursor: pointer; padding: 5px 12px; border-radius: 6px; line-height: 1; display: flex; align-items: center; border: 1px solid transparent; }
-    .ed-tab:hover { color: var(--text); }
-    .ed-tab.active { background: #fff; color: var(--text); font-weight: 500; border-color: var(--border); box-shadow: 0 1px 2px rgba(16,16,16,0.06); }
-    .ed-toolbar { display: flex; align-items: center; gap: 3px; }
-    .ed-tool { width: 32px; height: 32px; border: none; background: transparent; border-radius: 7px; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    /* Editor/Preview toggle — Figma: 4px container, #eff1f4 active fill, 12px regular */
+    .ed-tabs { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 4px; padding: 4px; }
+    .ed-tab { font-size: 12px; font-weight: 400; color: var(--text); cursor: pointer; padding: 2px 6px; border-radius: 2px; line-height: 20px; display: flex; align-items: center; }
+    .ed-tab.active { background: var(--bg-hover); }
+    /* Toolbar — Figma: 24px buttons, 14px icons, 9px dividers, 4px outer padding */
+    .ed-toolbar { display: flex; align-items: center; padding: 4px; }
+    .ed-tool { width: 24px; height: 24px; border: none; background: transparent; border-radius: 4px; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; }
     .ed-tool:hover { background: var(--bg-hover); }
-    .ed-tool svg { width: 19px; height: 19px; }
-    .ed-tool img { width: 19px; height: 19px; display: block; }
-    .ed-tool svg + svg { width: 12px; height: 12px; } /* dropdown caret stays small */
-    .ed-sep { width: 1px; height: 20px; background: var(--border); margin: 0 7px; }
+    .ed-tool svg { width: 14px; height: 14px; }
+    .ed-tool img { width: 14px; height: 14px; display: block; }
+    .ed-tool.text-style { width: 40px; }
+    .ed-tool .ts-caret { width: 10px; height: 10px; }
+    .ed-sep { width: 9px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ed-sep::before { content: ''; width: 1px; height: 20px; background: var(--border); }
 
     .canvas { flex: 1; overflow-y: auto; }
     .doc { max-width: 760px; margin: 0; padding: 28px 24px 80px; }
@@ -134,7 +137,7 @@
               <div class="ed-tab">Preview</div>
             </div>
             <div class="ed-toolbar">
-              <button class="ed-tool" title="Text style"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="margin-left:1px"><path d="m6 9 6 6 6-6"/></svg></button>
+              <button class="ed-tool text-style" title="Text style"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg><svg class="ts-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
               <span class="ed-sep"></span>
               <button class="ed-tool" title="Bold"><img src="assets/Menu-item.svg" alt="" /></button>
               <button class="ed-tool" title="Italic"><img src="assets/ff.svg" alt="" /></button>
@@ -147,6 +150,7 @@
               <button class="ed-tool" title="Table"><img src="assets/tbl.svg" alt="" /></button>
               <button class="ed-tool" title="Text box"><img src="assets/textbox.svg" alt="" /></button>
               <button class="ed-tool" title="Divider"><img src="assets/divider.svg" alt="" /></button>
+              <span class="ed-sep"></span>
               <button class="ed-tool" title="Code block"><img src="assets/codeblock.svg" alt="" /></button>
               <button class="ed-tool" title="Link"><img src="assets/link.svg" alt="" /></button>
             </div>
