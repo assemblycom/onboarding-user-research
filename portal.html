@@ -126,7 +126,7 @@
     <main class="main">
       <div class="crumb">Home</div>
       <div class="content">
-        <h1 class="hello" id="hello">Good morning, there</h1>
+        <h1 class="hello" id="hello">Good morning</h1>
         <p class="hello-sub">Here's what needs your attention today</p>
 
         <div class="hero"></div>
@@ -212,7 +212,7 @@
     document.documentElement.style.setProperty('--side-active', t.active);
 
     const company = getHashParam('company') || 'Studio';
-    const first = (getHashParam('name') || '').trim().split(/\s+/)[0] || 'there';
+    const first = (getHashParam('name') || '').trim().split(/\s+/)[0];
 
     // Brand the portal with the company
     document.getElementById('sideName').textContent = company;
@@ -220,7 +220,7 @@
     const ipWs = document.getElementById('ipWs'); if (ipWs) ipWs.textContent = company.trim().split(/\s+/)[0];
     const ipAvatar = document.getElementById('ipAvatar'); if (ipAvatar) ipAvatar.textContent = company.trim()[0].toUpperCase();
     const [abg, afg] = avatarColor(company); sa.style.background = abg; sa.style.color = afg;
-    document.getElementById('hello').textContent = 'Good morning, ' + first;
+    document.getElementById('hello').textContent = first ? ('Good morning, ' + first) : 'Good morning';
     document.getElementById('aboutText').textContent = company + ', a full-service marketing agency that helps businesses increase their brand awareness, attract new customers, and grow their bottom line. We specialize in crafting unique and effective marketing strategies that align with your business goals and help you stand out in a crowded marketplace.';
     document.getElementById('filesCo').textContent = company;
 
