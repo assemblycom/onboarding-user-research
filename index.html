@@ -571,7 +571,8 @@
     gauthLoading.hidden = false;
     setTimeout(() => {
       googleAuth.classList.remove('visible');
-      showAuthStep(3);
+      // Personalize/theme step is stashed for now — go straight to the builder.
+      goToBuilder();
     }, 1200);
   }
 
@@ -579,8 +580,8 @@
   document.getElementById('gauthAcct').addEventListener('click', googleSignIn);
   // Click the dimmed backdrop to cancel back to the welcome step
   googleAuth.addEventListener('click', e => { if (e.target === googleAuth) googleAuth.classList.remove('visible'); });
-  // Step 2 (workspace details) Continue → personalize step (same as the Google flow)
-  document.getElementById('studioContinue2').addEventListener('click', e => { if (e.currentTarget.disabled) return; showAuthStep(3); });
+  // Step 2 (workspace details) Continue → builder. Personalize/theme step is stashed for now.
+  document.getElementById('studioContinue2').addEventListener('click', e => { if (e.currentTarget.disabled) return; goToBuilder(); });
 
   // Portal URL auto-derives from the company name (slug + .mystudio.com),
   // and shows an "Available" check once there's a subdomain.
