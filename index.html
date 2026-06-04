@@ -571,7 +571,7 @@
   // Click the dimmed backdrop to cancel back to the welcome step
   googleAuth.addEventListener('click', e => { if (e.target === googleAuth) googleAuth.classList.remove('visible'); });
   // Step 2 (workspace details) Continue → personalize step (same as the Google flow)
-  document.getElementById('studioContinue2').addEventListener('click', () => showAuthStep(3));
+  document.getElementById('studioContinue2').addEventListener('click', e => { if (e.currentTarget.disabled) return; showAuthStep(3); });
 
   // Portal URL auto-derives from the company name (slug + .mystudio.com),
   // and shows an "Available" check once there's a subdomain.
@@ -603,12 +603,28 @@
       // Long company names get trimmed to fit — let the user know.
       if (shortened && msg) { msg.textContent = 'Portal URL is kept to ' + MAX_SUB + ' characters.'; msg.classList.add('show', 'warn'); }
     }
+
+    // Continue is disabled until name + company are filled and the URL is free.
+    const userName = document.getElementById('userName');
+    const cont2 = document.getElementById('studioContinue2');
+    function syncContinue2() {
+      if (!cont2) return;
+      const taken = box && box.classList.contains('invalid');
+      const ok = !!(userName && userName.value.trim()) && !!coInput.value.trim() && !taken;
+      cont2.disabled = !ok;
+      cont2.style.opacity = ok ? '1' : '0.45';
+      cont2.style.cursor = ok ? 'pointer' : 'default';
+    }
+
     coInput.addEventListener('input', () => {
       const raw = coInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
       sub.value = raw.slice(0, MAX_SUB);
       evalAvail(raw.length > MAX_SUB);
+      syncContinue2();
     });
-    sub.addEventListener('input', () => evalAvail(false));
+    sub.addEventListener('input', () => { evalAvail(false); syncContinue2(); });
+    if (userName) userName.addEventListener('input', syncContinue2);
+    syncContinue2();
   })();
 
   // Resolve the absolute URL of a sibling file ("builder", etc.) in
