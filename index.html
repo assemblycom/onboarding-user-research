@@ -58,6 +58,10 @@
     .studio-field > span { font-size:13px;letter-spacing:0.07em;color:#000 }
     .studio-field input { width:100%;height:46px;background:rgba(251,251,245,0.5);border:1px solid #dfe1e4;border-radius:5px;padding:0 16px;font-family:inherit;font-size:14px;color:#1a1a1a;caret-color:#1a1a1a;box-sizing:border-box }
     .studio-field input::placeholder { color:#90959d }
+.studio-acct { display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin-top:30px;padding:11px 14px;background:rgba(251,251,245,0.6);border:1px solid #dfe1e4;border-radius:5px }
+.studio-acct-email { font-size:14px;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.studio-acct-change { background:none;border:none;font-family:inherit;font-size:13px;color:#5a6068;cursor:pointer;text-decoration:underline;flex-shrink:0;padding:0 }
+.studio-acct-change:hover { color:#1a1a1a }
     .studio-field input:focus { outline:none;border-color:#b9bcc1 }
     /* Keep typed/autofilled text dark (Chrome autofill otherwise overrides the color) */
     .studio-field input:-webkit-autofill,
@@ -244,9 +248,13 @@
     <div class="studio-step" id="authStepEmail" hidden>
       <div class="studio-mark"><img src="assets/studio-mark.svg" alt="Studio" /></div>
       <h1 class="studio-h1">Sign in to Studio</h1>
-      <p class="studio-sub">Enter your email and password to continue</p>
-      <div class="studio-fields" style="margin-top:34px">
-        <label class="studio-field"><span>Email</span><input type="email" id="userEmail" placeholder="you@company.com" /></label>
+      <p class="studio-sub">Enter your password to continue</p>
+      <input type="hidden" id="userEmail" />
+      <div class="studio-acct">
+        <div class="studio-acct-email" id="authEmailDisplay">you@company.com</div>
+        <button type="button" class="studio-acct-change" id="authChangeEmail">Change</button>
+      </div>
+      <div class="studio-fields" style="margin-top:18px">
         <label class="studio-field"><span>Password</span><input type="password" placeholder="Enter your password" /></label>
       </div>
       <button class="studio-primary" id="emailContinue" type="button" style="margin-top:30px">Continue</button>
@@ -518,8 +526,12 @@
   if (studioContinue1) studioContinue1.addEventListener('click', () => {
     authVia = 'email';
     const ue = document.getElementById('userEmail'); if (ue && welcomeEmail) ue.value = welcomeEmail.value;
+    const disp = document.getElementById('authEmailDisplay'); if (disp && welcomeEmail) disp.textContent = welcomeEmail.value.trim() || 'you@company.com';
     showAuthStep('email');
   });
+  // "Change" on the password step goes back to the welcome step to edit the email.
+  const authChangeEmail = document.getElementById('authChangeEmail');
+  if (authChangeEmail) authChangeEmail.addEventListener('click', () => { showAuthStep(1); if (welcomeEmail) welcomeEmail.focus(); });
   // Email + password → workspace details (name / company)
   document.getElementById('emailContinue').addEventListener('click', () => showAuthStep(2));
 
