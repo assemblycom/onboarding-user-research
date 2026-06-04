@@ -71,6 +71,7 @@
 .studio-url.invalid { border-color:#e3a7a7 }
 .studio-url-msg { font-size:12px;color:#c0392b;margin:6px 0 0;display:none }
 .studio-url-msg.show { display:block }
+.studio-url-msg.warn { color:#8a6d1f }
     .studio-field input:focus { outline:none;border-color:#b9bcc1 }
     /* Keep typed/autofilled text dark (Chrome autofill otherwise overrides the color) */
     .studio-field input:-webkit-autofill,
@@ -586,7 +587,7 @@
     const CROSS = '<img src="assets/circle-x.svg" width="20" height="20" alt="" />';
     const MAX_SUB = 22;
     const slug = s => s.trim().toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, MAX_SUB);
-    function evalAvail() {
+    function evalAvail(shortened) {
       const v = sub.value.trim().toLowerCase();
       ind.className = 'studio-url-ind'; ind.innerHTML = '';
       if (msg) { msg.className = 'studio-url-msg'; msg.textContent = ''; }
@@ -596,12 +597,18 @@
         ind.classList.add('bad'); ind.innerHTML = CROSS;
         if (msg) { msg.textContent = 'That URL is taken — try another.'; msg.classList.add('show'); }
         if (box) box.classList.add('invalid');
-      } else {
-        ind.classList.add('ok'); ind.innerHTML = CHECK;
+        return;
       }
+      ind.classList.add('ok'); ind.innerHTML = CHECK;
+      // Long company names get trimmed to fit — let the user know.
+      if (shortened && msg) { msg.textContent = 'That name is long, so we shortened your URL to ' + MAX_SUB + ' characters.'; msg.classList.add('show', 'warn'); }
     }
-    coInput.addEventListener('input', () => { sub.value = slug(coInput.value); evalAvail(); });
-    sub.addEventListener('input', evalAvail);
+    coInput.addEventListener('input', () => {
+      const raw = coInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      sub.value = raw.slice(0, MAX_SUB);
+      evalAvail(raw.length > MAX_SUB);
+    });
+    sub.addEventListener('input', () => evalAvail(false));
   })();
 
   // Resolve the absolute URL of a sibling file ("builder", etc.) in
