@@ -23,7 +23,7 @@
     css.textContent =
       '.ftux-bar{height:4px;border-radius:99px;background:#e7e9ec;overflow:hidden;margin:0 0 12px;}' +
       '.ftux-bar-fill{height:100%;background:#1a1a1a;border-radius:99px;transition:width .35s ease;}' +
-      '.checklist-item{cursor:pointer;border-radius:6px;margin:0 -6px;padding:6px 6px;transition:background .12s;}' +
+      '.checklist-item{cursor:pointer;border-radius:6px;margin:0;padding:6px 8px 6px 0;transition:background .12s;}' +
       '.checklist-item:hover{background:var(--bg-hover,#eff1f4);}' +
       '.checklist-item.ftux-done{color:#8a9099;}' +
       '.inv-overlay{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.42);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;font-family:Inter,system-ui,sans-serif;}' +
