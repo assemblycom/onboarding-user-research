@@ -75,13 +75,10 @@
     .promptbox-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 12px; }
     .attach { width: 30px; height: 30px; border: none; background: transparent; border-radius: 8px; color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .attach:hover { background: var(--bg-hover); }
-    /* Send button: dark rounded square with a soft white glow behind the
-       arrow, so it reads with a little depth instead of a flat fill. */
-    .start-btn { position: relative; width: 44px; height: 44px; flex-shrink: 0; background: var(--dark); color: #fff; border: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; transition: opacity 0.15s, transform 0.12s; }
-    .start-btn::before { content: ""; position: absolute; left: 50%; top: 56%; width: 40px; height: 40px; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 68%); filter: blur(5px); pointer-events: none; }
-    .start-btn svg { position: relative; z-index: 1; width: 19px; height: 19px; }
-    .start-btn:not(:disabled):hover { transform: translateY(-1px); }
-    .start-btn:not(:disabled):active { transform: translateY(0); }
+    /* Send button: solid dark square, same fill as the portal's dark buttons. */
+    .start-btn { width: 34px; height: 34px; flex-shrink: 0; background: var(--dark); color: #fff; border: none; border-radius: 9px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.15s; }
+    .start-btn svg { width: 16px; height: 16px; }
+    .start-btn:not(:disabled):hover { opacity: 0.88; }
 
     /* Single row, but scroll instead of clipping when it doesn't fit. */
     .chips { display: flex; gap: 8px; margin-top: 16px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
