@@ -601,7 +601,7 @@
       }
       ind.classList.add('ok'); ind.innerHTML = CHECK;
       // Long company names get trimmed to fit — let the user know.
-      if (shortened && msg) { msg.textContent = 'That name is long, so we shortened your URL to ' + MAX_SUB + ' characters.'; msg.classList.add('show', 'warn'); }
+      if (shortened && msg) { msg.textContent = 'Portal URL is kept to ' + MAX_SUB + ' characters.'; msg.classList.add('show', 'warn'); }
     }
     coInput.addEventListener('input', () => {
       const raw = coInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
