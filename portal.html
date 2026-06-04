@@ -79,7 +79,7 @@
     /* Mini client-portal preview, signed in as the test client. Bleeds off the
        bottom + right edges of the modal (rounded top-left, clipped by the card). */
     .intro-portal { width: 100%; height: 400px; background: #fff; border: 1px solid var(--border); border-right: none; border-bottom: none; border-radius: 12px 0 0 0; overflow: hidden; box-shadow: 0 10px 26px rgba(0,0,0,0.12); display: flex; }
-    .ip-side { width: 112px; flex-shrink: 0; background: var(--side, #d9def9); padding: 13px 10px; display: flex; flex-direction: column; gap: 8px; }
+    .ip-side { width: 132px; flex-shrink: 0; background: var(--side, #d9def9); padding: 13px 10px; display: flex; flex-direction: column; gap: 8px; }
     .ip-ws { display: flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 500; color: var(--side-tx, #2f3650); }
     .ip-avatar { width: 20px; height: 20px; border-radius: 6px; background: #f0f1f3; color: #5a6068; font-size: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .ip-nav { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
@@ -88,9 +88,9 @@
     .ip-item svg { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.85; }
     .ip-client { margin-top: auto; display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 9px; background: rgba(255,255,255,0.6); }
     .ip-cav { width: 24px; height: 24px; border-radius: 50%; background: #e4f1eb; color: #44856f; font-size: 9px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .ip-cname { font-size: 10.5px; color: var(--side-tx, #2f3650); line-height: 1.3; }
-    .ip-cname b { font-weight: 500; }
-    .ip-cname span { opacity: 0.6; font-size: 9.5px; }
+    .ip-cname { min-width: 0; flex: 1; color: var(--side-tx, #2f3650); line-height: 1.3; }
+    .ip-cname b { display: block; font-size: 10.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ip-cname span { display: block; font-size: 8.5px; opacity: 0.6; white-space: nowrap; }
     .ip-main { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 11px; min-width: 0; }
     .ip-greet { font-size: 15px; font-weight: 500; color: #1a1a1a; }
     .ip-sub { height: 7px; width: 68%; border-radius: 4px; background: #eef0f2; }
@@ -99,6 +99,7 @@
     .ip-cardm { flex: 1; height: 42px; border: 1px solid #eceef0; border-radius: 8px; background: #fafbfc; }
     .ip-line { height: 8px; border-radius: 4px; background: #eef0f2; }
     .ip-line.short { width: 56%; }
+    .ip-head2 { height: 10px; width: 38%; border-radius: 4px; background: #dadde1; margin-top: 6px; }
     @media (max-width: 640px) { .intro-right { display: none; } }
   </style>
   <script>(function(){ try { if (!localStorage.getItem('onb.portalIntroSeen')) document.documentElement.classList.add('show-portal-intro'); } catch (e) { document.documentElement.classList.add('show-portal-intro'); } })();</script>
@@ -176,13 +177,17 @@
               <span class="ip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</span>
               <span class="ip-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Files</span>
             </div>
-            <div class="ip-client"><span class="ip-cav">TC</span><span class="ip-cname"><b>Test Client</b><br><span>Viewing as</span></span></div>
+            <div class="ip-client"><span class="ip-cav">TC</span><span class="ip-cname"><span>Viewing as</span><b>Test Client</b></span></div>
           </div>
           <div class="ip-main">
             <div class="ip-greet">Good morning</div>
             <div class="ip-sub"></div>
             <div class="ip-hero"></div>
             <div class="ip-cards"><div class="ip-cardm"></div><div class="ip-cardm"></div><div class="ip-cardm"></div></div>
+            <div class="ip-line"></div>
+            <div class="ip-line short"></div>
+            <div class="ip-head2"></div>
+            <div class="ip-line"></div>
             <div class="ip-line"></div>
             <div class="ip-line short"></div>
           </div>
