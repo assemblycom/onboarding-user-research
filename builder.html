@@ -512,41 +512,38 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.asm-icon-picker-btn.selected { border-color: rgb(20, 21, 26); background: #F4F4EF; }',
 
       // ── Publish popover ─────────────────────────────────
-      '.asm-publish-popover { position: fixed; top: 56px; right: 16px; width: 440px; background: #fff; border: 1px solid rgba(20, 21, 26, 0.10); border-radius: 14px; box-shadow: 0 12px 32px rgba(20, 21, 26, 0.14), 0 1px 2px rgba(20, 21, 26, 0.04); z-index: 180; display: none; font-family: var(--font-sans, system-ui); }',
-      '.asm-publish-popover.open { display: block; animation: asmFadeIn 0.18s ease-out; }',
-      '.asm-publish-header { font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(20, 21, 26, 0.55); text-align: center; padding: 22px 24px 16px; }',
-      '.asm-publish-cards { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 0 24px 18px; }',
-      '.asm-publish-card { flex: 1; padding: 14px 16px; border-radius: 12px; min-width: 0; position: relative; }',
-      // Draft card — slightly muted, dashed border with a corner-cut feel.
-      // No tint, no glow. Communicates "work in progress" via typography
-      // weight + dashed border + softened version number.
-      '.asm-publish-card.current { background: #FAFAF7; border: 1px dashed rgba(20, 21, 26, 0.18); }',
-      '.asm-publish-card.current .asm-publish-card-version { color: rgba(20, 21, 26, 0.55); font-weight: 500; }',
-      '.asm-publish-card.current .asm-publish-card-label { color: rgba(20, 21, 26, 0.45); }',
-      // Going-live (and post-publish) card — calm and confident. Solid
-      // border, slight surface lift via shadow only — no border tint.
-      '.asm-publish-card.going-live { background: #fff; border: 1px solid rgba(20, 21, 26, 0.85); box-shadow: 0 1px 0 rgba(20, 21, 26, 0.04); }',
-      '.asm-publish-card-label { font-family: var(--font-mono, ui-monospace, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(20, 21, 26, 0.55); margin-bottom: 8px; }',
-      '.asm-publish-card-row { display: flex; align-items: center; gap: 8px; }',
-      '.asm-publish-card-version { font-size: 18px; font-weight: 600; color: rgb(20, 21, 26); letter-spacing: -0.02em; }',
-      '.asm-publish-pill { font-family: var(--font-mono, ui-monospace, monospace); font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border-radius: 99px; }',
-      '.asm-publish-pill.live, .asm-publish-pill.published { background: #E6F4EE; color: #0B5C3E; }',
-      '.asm-publish-pill.draft { background: transparent; color: rgba(20, 21, 26, 0.55); border: 1px dashed rgba(20, 21, 26, 0.22); }',
-      '.asm-publish-arrow { color: rgba(20, 21, 26, 0.45); flex-shrink: 0; }',
-      '.asm-publish-note { font-size: 13px; line-height: 1.45; color: rgba(20, 21, 26, 0.55); padding: 0 24px 18px; margin: 0; }',
-      '.asm-publish-actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding: 14px 18px; background: #FAFAF7; border-top: 1px solid rgba(20, 21, 26, 0.06); border-radius: 0 0 14px 14px; }',
-      '.asm-publish-cancel { background: transparent; border: 0; padding: 8px 14px; font-family: inherit; font-size: 13px; font-weight: 500; color: rgba(20, 21, 26, 0.65); cursor: pointer; border-radius: 7px; }',
-      '.asm-publish-cancel:hover { background: rgba(20, 21, 26, 0.05); color: rgb(20, 21, 26); }',
-      '.asm-publish-confirm { background: rgb(20, 21, 26); color: #fff; border: 0; padding: 8px 18px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 8px; }',
-      '.asm-publish-confirm:hover { background: #000; }',
-      // Success state — calm, professional. Header just gets a small
-      // inline checkmark; no medallion, no card glow, no bouncy scale.
-      // The whole popover crossfades to the new layout in 200ms.
-      '.asm-publish-popover.success .asm-publish-cancel { display: none; }',
-      '.asm-publish-popover.success .asm-publish-header { color: rgba(20, 21, 26, 0.55); display: inline-flex; align-items: center; gap: 8px; padding: 22px 24px 16px; width: 100%; justify-content: center; box-sizing: border-box; }',
-      '.asm-publish-success-medallion { display: none; width: 14px; height: 14px; border-radius: 50%; background: #0B5C3E; color: #fff; align-items: center; justify-content: center; flex-shrink: 0; }',
-      '.asm-publish-popover.success .asm-publish-success-medallion { display: inline-flex; }',
-      '.asm-publish-popover.success .asm-publish-cards, .asm-publish-popover.success .asm-publish-note { animation: asmFadeIn 0.22s ease-out; }',
+      '.asm-publish-popover { position: fixed; top: 56px; right: 16px; width: 384px; max-width: calc(100vw - 32px); background: #fff; border: 1px solid #e6e8eb; border-radius: 14px; box-shadow: 0 16px 40px rgba(16,24,40,0.16), 0 2px 6px rgba(16,24,40,0.05); z-index: 180; display: none; overflow: hidden; font-family: var(--font-sans, "Inter", system-ui); color: #212b36; }',
+      '.asm-publish-popover.open { display: block; animation: asmFadeIn 0.16s ease-out; }',
+      '.asm-pub-head { padding: 18px 20px 16px; border-bottom: 1px solid #eceef1; }',
+      '.asm-pub-title { font-size: 16px; font-weight: 500; color: #212b36; }',
+      '.asm-pub-sub { font-size: 13px; color: #6b6f76; margin-top: 3px; }',
+      '.asm-pub-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }',
+      '.asm-pub-row { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px; border: 1px solid #e6e8eb; border-radius: 10px; background: #fff; font-family: inherit; font-size: 14px; color: #212b36; text-align: left; box-sizing: border-box; }',
+      '.asm-pub-row-btn { cursor: pointer; transition: background 0.12s; }',
+      '.asm-pub-row-btn:hover { background: #f8f9fb; }',
+      '.asm-pub-ic { display: flex; color: #6b6f76; flex-shrink: 0; }',
+      '.asm-pub-ic svg { width: 18px; height: 18px; }',
+      '.asm-pub-row-label { flex: 1; min-width: 0; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }',
+      '.asm-pub-val { font-size: 13.5px; color: #6b6f76; white-space: nowrap; }',
+      '.asm-pub-chev { color: #9aa0a6; display: flex; flex-shrink: 0; }',
+      '.asm-pub-chev svg { width: 16px; height: 16px; }',
+      '.asm-pub-edit { background: none; border: 0; padding: 4px; cursor: pointer; color: #9aa0a6; display: flex; border-radius: 6px; flex-shrink: 0; }',
+      '.asm-pub-edit svg { width: 15px; height: 15px; }',
+      '.asm-pub-edit:hover { background: #eff1f4; color: #6b6f76; }',
+      '.asm-pub-foot { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid #eceef1; }',
+      '.asm-pub-cancel { background: transparent; border: 0; padding: 9px 14px; font-family: inherit; font-size: 14px; font-weight: 500; color: #6b6f76; cursor: pointer; border-radius: 8px; }',
+      '.asm-pub-cancel:hover { background: #eff1f4; color: #212b36; }',
+      '.asm-pub-confirm { background: #1a1a1a; color: #fff; border: 0; padding: 9px 18px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; }',
+      '.asm-pub-confirm:hover { background: #000; }',
+      '.asm-pub-success { display: none; flex-direction: column; align-items: center; text-align: center; padding: 34px 24px 30px; }',
+      '.asm-publish-popover.success .asm-pub-head, .asm-publish-popover.success .asm-pub-body, .asm-publish-popover.success .asm-pub-foot { display: none; }',
+      '.asm-publish-popover.success .asm-pub-success { display: flex; animation: asmFadeIn 0.22s ease-out; }',
+      '.asm-pub-badge { width: 48px; height: 48px; border-radius: 50%; background: #e4f1eb; color: #1d9a52; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }',
+      '.asm-pub-badge svg { width: 24px; height: 24px; }',
+      '.asm-pub-success-title { font-size: 17px; font-weight: 500; color: #212b36; }',
+      '.asm-pub-success-sub { font-size: 13.5px; color: #6b6f76; margin-top: 6px; max-width: 270px; line-height: 1.5; }',
+      '.asm-pub-done { margin-top: 22px; background: #1a1a1a; color: #fff; border: 0; padding: 9px 22px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; }',
+      '.asm-pub-done:hover { background: #000; }',
 
       // ── Right-side actions (always visible — replaces bundle) ──
       '.asm-topbar-right { display: flex; align-items: center; gap: 8px; }',
@@ -2160,18 +2157,45 @@ document.addEventListener('DOMContentLoaded', async function() {
     pop = document.createElement('div');
     pop.id = 'asm-publish-popover';
     pop.className = 'asm-publish-popover';
+    var CLOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>';
+    var PENCIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+    var BELL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+    var EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+    var CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
+    var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     pop.innerHTML = [
-      '<div class="asm-publish-header" id="asm-publish-header">',
-      '  <span class="asm-publish-success-medallion" aria-hidden="true">',
-      '    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-      '  </span>',
-      '  <span id="asm-publish-header-text">PUBLISH LATEST VERSION</span>',
+      '<div class="asm-pub-head">',
+      '  <div class="asm-pub-title">Publish app</div>',
+      '  <div class="asm-pub-sub">Choose who can see this app once published.</div>',
       '</div>',
-      '<div class="asm-publish-cards" id="asm-publish-cards"></div>',
-      '<p class="asm-publish-note" id="asm-publish-note">Publishing replaces the live version your team sees. The previous version stays available in history.</p>',
-      '<div class="asm-publish-actions">',
-      '  <button type="button" class="asm-publish-cancel" id="asm-publish-cancel">Cancel</button>',
-      '  <button type="button" class="asm-publish-confirm" id="asm-publish-confirm">Publish</button>',
+      '<div class="asm-pub-body">',
+      '  <div class="asm-pub-row">',
+      '    <span class="asm-pub-ic">' + CLOCK + '</span>',
+      '    <span class="asm-pub-row-label" id="asm-pub-appname">Time Tracker</span>',
+      '    <button type="button" class="asm-pub-edit" title="Rename">' + PENCIL + '</button>',
+      '  </div>',
+      '  <button type="button" class="asm-pub-row asm-pub-row-btn">',
+      '    <span class="asm-pub-ic">' + BELL + '</span>',
+      '    <span class="asm-pub-row-label">Notifications</span>',
+      '    <span class="asm-pub-val">Default</span>',
+      '    <span class="asm-pub-chev">' + CHEV + '</span>',
+      '  </button>',
+      '  <button type="button" class="asm-pub-row asm-pub-row-btn">',
+      '    <span class="asm-pub-ic">' + EYE + '</span>',
+      '    <span class="asm-pub-row-label">Visibility</span>',
+      '    <span class="asm-pub-val">All clients</span>',
+      '    <span class="asm-pub-chev">' + CHEV + '</span>',
+      '  </button>',
+      '</div>',
+      '<div class="asm-pub-foot">',
+      '  <button type="button" class="asm-pub-cancel" id="asm-publish-cancel">Cancel</button>',
+      '  <button type="button" class="asm-pub-confirm" id="asm-publish-confirm">Publish</button>',
+      '</div>',
+      '<div class="asm-pub-success">',
+      '  <span class="asm-pub-badge">' + CHECK + '</span>',
+      '  <div class="asm-pub-success-title">App published</div>',
+      '  <div class="asm-pub-success-sub" id="asm-pub-success-sub">Time Tracker is now live for your clients.</div>',
+      '  <button type="button" class="asm-pub-done" id="asm-pub-done">Done</button>',
       '</div>'
     ].join('');
     document.body.appendChild(pop);
@@ -2182,13 +2206,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
     pop.querySelector('#asm-publish-confirm').addEventListener('click', function(e) {
       e.stopPropagation();
-      // After first confirm the popover flips to success state — the
-      // same button now reads "Done" and just closes.
-      if (pop.classList.contains('success')) {
-        closePublishPopover();
-      } else {
-        confirmPublish();
-      }
+      confirmPublish();
+    });
+    pop.querySelector('#asm-pub-done').addEventListener('click', function(e) {
+      e.stopPropagation();
+      closePublishPopover();
     });
     // Outside click closes — but ignore clicks on the Publish button
     // (which would re-open it on the next listener) and on the popover.
@@ -2238,13 +2260,14 @@ document.addEventListener('DOMContentLoaded', async function() {
       '</div>'
     ].join('');
   }
+  function appTitleForPublish() {
+    return (STATE.appTitle && STATE.appTitle !== 'Untitled') ? STATE.appTitle : 'Time Tracker';
+  }
   function openPublishPopover() {
     var pop = ensurePublishPopover();
     pop.classList.remove('success');
-    pop.querySelector('#asm-publish-header-text').textContent = 'PUBLISH LATEST VERSION';
-    pop.querySelector('#asm-publish-note').textContent = 'Publishing replaces the live version your team sees. The previous version stays available in history.';
-    pop.querySelector('#asm-publish-confirm').textContent = 'Publish';
-    renderPublishCards();
+    var nm = pop.querySelector('#asm-pub-appname');
+    if (nm) nm.textContent = appTitleForPublish();
     pop.classList.add('open');
   }
   function closePublishPopover() {
@@ -2265,11 +2288,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     var pop = document.getElementById('asm-publish-popover');
     if (!pop) return;
+    var sub = pop.querySelector('#asm-pub-success-sub');
+    if (sub) sub.textContent = appTitleForPublish() + ' is now live for your clients.';
     pop.classList.add('success');
-    pop.querySelector('#asm-publish-header-text').textContent = 'PUBLISHED';
-    pop.querySelector('#asm-publish-note').textContent = 'Your team is now seeing version V' + STATE.appVersion + '. Earlier versions stay available in history.';
-    pop.querySelector('#asm-publish-confirm').textContent = 'Done';
-    renderPublishCards('success');
   }
 
   // Posts a version-block component (thumb + caption + overflow menu)
