@@ -29,7 +29,7 @@
     '.asm-sb .nav-group-label{font-size:11px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);padding:14px 8px 5px;}' +
     '.asm-sb .nav-item{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;font-size:13.5px;color:var(--text);cursor:pointer;text-decoration:none;}' +
     '.asm-sb .nav-item:hover{background:var(--bg-hover);}' +
-    '.asm-sb .nav-item.active{background:var(--bg-hover);font-weight:500;}' +
+    '.asm-sb .nav-item.active{background:var(--bg-hover);}' +
     '.asm-sb .nav-item svg{color:var(--muted);flex-shrink:0;}' +
     '.asm-sb .nav-item .ic,.asm-sb .ws-caret-img,.asm-sb .checklist-item .ic{display:block;flex-shrink:0;}' +
     '.asm-sb .nav-item.add{color:var(--muted);}' +
