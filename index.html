@@ -62,8 +62,13 @@
 .studio-url:focus-within { border-color:#b9bcc1 }
 .studio-url input { flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:inherit;font-size:14px;color:#1a1a1a;padding:0;height:100% }
 .studio-url-suffix { font-size:14px;color:#1a1a1a;white-space:nowrap }
-.studio-url-ok { margin-left:10px;font-size:12px;font-weight:500;color:#1d7a45;white-space:nowrap;display:none;align-items:center;gap:4px }
-.studio-url-ok.show { display:inline-flex }
+.studio-url-ind { width:20px;height:20px;border-radius:50%;margin-left:10px;flex-shrink:0;display:none;align-items:center;justify-content:center;color:#fff }
+.studio-url-ind svg { width:12px;height:12px }
+.studio-url-ind.ok { display:inline-flex;background:#6b7cf0 }
+.studio-url-ind.bad { display:inline-flex;background:#e5484d }
+.studio-url.invalid { border-color:#e3a7a7 }
+.studio-url-msg { font-size:12px;color:#c0392b;margin:6px 0 0;display:none }
+.studio-url-msg.show { display:block }
     .studio-field input:focus { outline:none;border-color:#b9bcc1 }
     /* Keep typed/autofilled text dark (Chrome autofill otherwise overrides the color) */
     .studio-field input:-webkit-autofill,
@@ -265,11 +270,12 @@
         <label class="studio-field"><span>Your name</span><input type="text" id="userName" placeholder="John Doe" /></label>
         <label class="studio-field"><span>Company name</span><input type="text" id="companyName" placeholder="Your company" /></label>
         <label class="studio-field"><span>Portal URL</span>
-          <div class="studio-url">
+          <div class="studio-url" id="portalUrlBox">
             <input type="text" id="portalSub" placeholder="yourcompany" />
             <span class="studio-url-suffix">.mystudio.com</span>
-            <span class="studio-url-ok" id="portalOk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Available</span>
+            <span class="studio-url-ind" id="portalInd"></span>
           </div>
+          <p class="studio-url-msg" id="portalMsg"></p>
         </label>
       </div>
       <button class="studio-primary" id="studioContinue2" type="button" style="margin-top:30px">Continue</button>
@@ -568,13 +574,31 @@
   (function () {
     const coInput = document.getElementById('companyName');
     const sub = document.getElementById('portalSub');
-    const ok = document.getElementById('portalOk');
+    const ind = document.getElementById('portalInd');
+    const msg = document.getElementById('portalMsg');
+    const box = document.getElementById('portalUrlBox');
     if (!coInput || !sub) return;
+    const TAKEN = ['acme', 'demo', 'test', 'studio', 'admin', 'app', 'client', 'portal', 'rocket'];
+    const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    const CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
     let edited = false;
     const slug = s => s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-    const refreshOk = () => { if (ok) ok.classList.toggle('show', sub.value.trim().length > 0); };
-    coInput.addEventListener('input', () => { if (!edited) { sub.value = slug(coInput.value); refreshOk(); } });
-    sub.addEventListener('input', () => { edited = true; refreshOk(); });
+    function evalAvail() {
+      const v = sub.value.trim().toLowerCase();
+      ind.className = 'studio-url-ind'; ind.innerHTML = '';
+      if (msg) { msg.className = 'studio-url-msg'; msg.textContent = ''; }
+      if (box) box.classList.remove('invalid');
+      if (!v) return;
+      if (TAKEN.indexOf(v) !== -1) {
+        ind.classList.add('bad'); ind.innerHTML = CROSS;
+        if (msg) { msg.textContent = 'That URL is taken — try another.'; msg.classList.add('show'); }
+        if (box) box.classList.add('invalid');
+      } else {
+        ind.classList.add('ok'); ind.innerHTML = CHECK;
+      }
+    }
+    coInput.addEventListener('input', () => { if (!edited) { sub.value = slug(coInput.value); evalAvail(); } });
+    sub.addEventListener('input', () => { edited = true; evalAvail(); });
   })();
 
   // Resolve the absolute URL of a sibling file ("builder", etc.) in
