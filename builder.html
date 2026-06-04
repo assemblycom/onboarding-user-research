@@ -573,8 +573,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
       // ── Right-side actions (always visible — replaces bundle) ──
       '.asm-topbar-right { display: flex; align-items: center; gap: 8px; }',
-      '.asm-topbar-history { width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(20, 24, 35, 0.16); background: #fff; display: grid; place-items: center; color: rgb(20, 21, 26); cursor: pointer; padding: 0; pointer-events: auto; }',
+      '.asm-topbar-history { position: relative; width: 30px; height: 30px; border-radius: 7px; border: 1px solid rgba(20, 24, 35, 0.16); background: #fff; display: grid; place-items: center; color: rgb(20, 21, 26); cursor: default; padding: 0; pointer-events: auto; }',
       '.asm-topbar-history:hover { background: #F4F4EF; }',
+      // Version history is disabled in the prototype — explain on hover.
+      '.asm-topbar-history[data-asm-tip]::after { content: attr(data-asm-tip); position: absolute; top: calc(100% + 8px); right: 0; background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 500; line-height: 1; padding: 7px 10px; border-radius: 7px; white-space: nowrap; opacity: 0; transform: translateY(-2px); pointer-events: none; transition: opacity .12s, transform .12s; box-shadow: 0 4px 14px rgba(0,0,0,0.18); z-index: 200; }',
+      '.asm-topbar-history:hover[data-asm-tip]::after { opacity: 1; transform: translateY(0); }',
       // Version history button only appears once the live AI preview is
       // ready (i.e. STATE.phase === \'done\').
       'body.asm-phase-qa #asm-topbar-history, body.asm-phase-building #asm-topbar-history { display: none !important; }',
@@ -1815,7 +1818,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         '    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/></svg>',
         '    <span class="asm-mobile-toggle-label">Preview</span>',
         '  </button>',
-        '  <button type="button" class="asm-topbar-history" id="asm-topbar-history" title="Version history">',
+        '  <button type="button" class="asm-topbar-history" id="asm-topbar-history" data-asm-tip="Not part of this prototype">',
         '    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-7"/><path d="M3 4v5h5"/><path d="M12 8v4l3 2"/></svg>',
         '  </button>',
         '  <button type="button" class="asm-topbar-publish" id="asm-topbar-publish">Publish app</button>',
@@ -1827,10 +1830,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       ].join('');
       document.body.appendChild(bar);
 
-      bar.querySelector('#asm-topbar-history').addEventListener('click', function() {
-        if (window.__vhOpen) { window.__vhOpen(0); return; }
-        invokeReactOnClick(findBundleHistoryBtn());
-      });
+      // Version history is disabled in the prototype — the clock stays for
+      // realism but does nothing; the hover tooltip explains why.
+      bar.querySelector('#asm-topbar-history').addEventListener('click', function() {});
       bar.querySelector('#asm-topbar-publish').addEventListener('click', function(e) {
         if (e.currentTarget.disabled) return;
         openPublishPopover();
