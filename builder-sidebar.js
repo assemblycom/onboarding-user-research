@@ -207,9 +207,39 @@
     setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 280);
   }
 
+  // The generated-app client-portal preview ships a couple of mismatched nav
+  // icons (Time Tracker as a house, Helpdesk as an empty square). We can't edit
+  // the compiled bundle, so swap just the icon paths in place — same size, so
+  // layout/resize is untouched. Re-runs each tick to survive React re-renders.
+  var PREVIEW_ICONS = {
+    'Time Tracker': '<circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path>',
+    'Helpdesk': '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="3.4"></circle><path d="m4.9 4.9 4.3 4.3"></path><path d="m14.8 14.8 4.3 4.3"></path><path d="m19.1 4.9-4.3 4.3"></path><path d="m9.2 14.8-4.3 4.3"></path>'
+  };
+  function fixPreviewIcons() {
+    var rows = document.querySelectorAll('div[style*="gap: 9px"]');
+    for (var i = 0; i < rows.length; i++) {
+      var d = rows[i];
+      var svg = d.querySelector(':scope > svg');
+      if (!svg) continue;
+      var label = '';
+      for (var c = 0; c < d.childNodes.length; c++) {
+        var n = d.childNodes[c];
+        if (n.nodeType === 3) label += n.textContent;
+        else if (n.nodeName === 'SPAN') label += n.textContent;
+      }
+      label = label.trim();
+      var paths = PREVIEW_ICONS[label];
+      if (paths && svg.getAttribute('data-asm-icon') !== label) {
+        svg.innerHTML = paths;
+        svg.setAttribute('data-asm-icon', label);
+      }
+    }
+  }
+
   function apply() {
     ensureStyle();
     rebrandText();
+    fixPreviewIcons();
     var sb = findBundleSidebar();
     if (!sb) { ensureCover(); return; }
     // Already replaced and still intact — just keep the draft entry in sync.
