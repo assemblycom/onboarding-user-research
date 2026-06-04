@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   var PAYLOAD = parseHash();
-  var BUILD_DURATION = 10000;
+  var BUILD_DURATION = 60000;
 
   // Bundle is a React app — synthetic .click() doesn't fire its
   // delegated handlers. Reach into the fiber's props and call onClick
@@ -4466,7 +4466,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         var elapsed = buildElapsed();
         var thinkStart = 2700;
         if (thinkingEl && elapsed > thinkStart) {
-          var idx = Math.max(0, Math.min(BUILD_STATES.length - 1, Math.floor((elapsed - thinkStart) / 1100)));
+          var idx = Math.max(0, Math.min(BUILD_STATES.length - 1, Math.floor((elapsed - thinkStart) / 7600)));
           setThinkingLabel(thinkingEl, BUILD_STATES[idx] + '…');
         }
 
