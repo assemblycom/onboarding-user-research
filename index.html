@@ -72,6 +72,12 @@
 .studio-url-msg { font-size:12px;color:#c0392b;margin:6px 0 0;display:none }
 .studio-url-msg.show { display:block }
 .studio-url-msg.warn { color:#8a6d1f }
+.studio-loader { position:fixed;inset:0;z-index:300;background:#F5F5F0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;font-family:"Inter",system-ui,sans-serif }
+.studio-loader[hidden] { display:none }
+.sl-mark img { width:40px;height:40px;display:block }
+.sl-spinner { width:26px;height:26px;border:3px solid rgba(16,16,16,0.12);border-top-color:#1a1a1a;border-radius:50%;animation:sl-spin 0.8s linear infinite }
+@keyframes sl-spin { to { transform:rotate(360deg) } }
+.sl-text { font-size:15px;color:#6b6f76 }
     .studio-field input:focus { outline:none;border-color:#b9bcc1 }
     /* Keep typed/autofilled text dark (Chrome autofill otherwise overrides the color) */
     .studio-field input:-webkit-autofill,
@@ -234,6 +240,11 @@
   </div>
 </div><div class="mx-auto w-full max-w-[620px]" style="padding-top:130px"><div class="relative overflow-hidden" style="-webkit-mask-image:linear-gradient(to right, transparent 0, black 12%, black 88%, transparent 100%);mask-image:linear-gradient(to right, transparent 0, black 12%, black 88%, transparent 100%)" aria-label="Alpha users"><div class="logo-marquee-track flex w-max items-center gap-x-12 md:gap-x-16"><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Capital One</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Collective</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Ditto</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Heritage Law Partners</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Waymaker</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">ce</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">AURA</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">CEO Bankable</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Capital One</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Collective</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Ditto</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Heritage Law Partners</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Waymaker</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">ce</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">AURA</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">CEO Bankable</span></div></div></div></div></div></section></div></div></div></div></body>
 <!-- Auth Modal -->
+<div class="studio-loader" id="studioLoader" hidden>
+  <div class="sl-mark"><img src="assets/studio-mark.svg" alt="" /></div>
+  <div class="sl-spinner"></div>
+  <div class="sl-text" id="slText">Setting up your workspace…</div>
+</div>
 <div class="studio-auth" id="authOverlay">
   <div class="studio-auth-card">
     <button class="studio-auth-close" id="authClose" aria-label="Close">✕</button>
@@ -660,7 +671,21 @@
     if (uEmail) params.push('email=' + encodeURIComponent(uEmail));
     params.push('theme=' + encodeURIComponent(selectedTheme));
     const hash = params.length ? '#' + params.join('&') : '';
-    window.location.href = resolveSiblingUrl('studio') + hash;
+    const dest = resolveSiblingUrl('studio') + hash;
+
+    // Realistic "provisioning your workspace" delay before landing in Studio.
+    document.getElementById('authOverlay').classList.remove('visible');
+    const loader = document.getElementById('studioLoader');
+    const slText = document.getElementById('slText');
+    if (loader) {
+      loader.hidden = false;
+      const stages = ['Setting up your workspace…', 'Provisioning your client portal…', 'Almost ready…'];
+      let si = 0;
+      const tick = setInterval(() => { si++; if (slText && si < stages.length) slText.textContent = stages[si]; }, 1300);
+      setTimeout(() => { clearInterval(tick); window.location.href = dest; }, 4000);
+    } else {
+      window.location.href = dest;
+    }
   }
 
   // ── Q&A Planning Flow (Claude planning-mode style) ──
