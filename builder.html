@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.asm-pub-done { margin-top: 22px; background: #1a1a1a; color: #fff; border: 0; padding: 9px 22px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 8px; }',
       '.asm-pub-done:hover { background: #000; }',
       // ── Custom visibility rules (clean, aligned with the app UI) ──
-      '.asm-vis-rules { display: none; flex-direction: column; gap: 10px; padding: 4px 20px 8px; }',
+      '.asm-vis-rules { display: none; flex-direction: column; gap: 10px; padding: 16px 20px 8px; margin-top: 8px; border-top: 1px solid #eceef1; }',
       '.asm-pub-view.vis-custom .asm-vis-rules { display: flex; }',
       '.asm-vis-rules-label { font-size: 12px; color: #6b6f76; }',
       '.asm-vis-rule { border: 1px solid #dfe1e4; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; background: #fff; }',
@@ -2159,15 +2159,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
       });
     }
-    // Publish is greyed until the live preview is ready (done phase), and once
-    // published with no further changes it reads "Published" and disables —
-    // the app is up to date. A later refinement re-enables it.
+    // Publish is greyed only until the live preview is ready (done phase). It
+    // stays enabled after that because it opens the settings dropdown — the
+    // actual Publish action inside the dropdown is what disables when the app
+    // is already up to date.
     var pub = bar.querySelector('#asm-topbar-publish');
-    if (pub) {
-      if (STATE.phase !== 'done') { pub.disabled = true; if (pub.textContent !== 'Publish app') pub.textContent = 'Publish app'; }
-      else if (STATE.isPublished && STATE.upToDate) { pub.disabled = true; if (pub.textContent !== 'Published') pub.textContent = 'Published'; }
-      else { pub.disabled = false; if (pub.textContent !== 'Publish app') pub.textContent = 'Publish app'; }
-    }
+    if (pub) { pub.disabled = (STATE.phase !== 'done'); if (pub.textContent !== 'Publish app') pub.textContent = 'Publish app'; }
   }
 
   // ============================================================
@@ -2519,6 +2516,8 @@ document.addEventListener('DOMContentLoaded', async function() {
           var visView = pop.querySelector('.asm-pub-view[data-pview="visibility"]');
           if (visView) visView.classList.toggle('vis-custom', o.getAttribute('data-label') === 'Custom');
         }
+        // Changing a setting is an unpublished change → re-enable Publish.
+        if (STATE.isPublished) { STATE.upToDate = false; syncPublishConfirm(); }
       });
     });
     // Custom-visibility rule interactions: remove a rule, remove a value chip,
@@ -2632,11 +2631,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     pop.setAttribute('data-view', 'main');
     var t = pop.querySelector('#asm-pub-main-title'); if (t) t.textContent = 'Publish app';
     var s = pop.querySelector('#asm-pub-main-sub'); if (s) s.textContent = 'Choose who can see this app once published.';
-    var btn = pop.querySelector('#asm-publish-confirm'); if (btn) { btn.disabled = false; btn.textContent = 'Publish'; }
     var cancel = pop.querySelector('#asm-publish-cancel'); if (cancel) cancel.style.visibility = '';
     var nm = pop.querySelector('#asm-pub-appname');
     if (nm) nm.textContent = appTitleForPublish();
+    syncPublishConfirm();
     pop.classList.add('open');
+  }
+  // The dropdown's Publish action is disabled when the app is already published
+  // with no changes since (nothing to publish); a settings change re-enables it.
+  function syncPublishConfirm() {
+    var pop = document.getElementById('asm-publish-popover');
+    if (!pop) return;
+    var btn = pop.querySelector('#asm-publish-confirm');
+    if (!btn) return;
+    if (STATE.isPublished && STATE.upToDate) { btn.disabled = true; btn.textContent = 'Published'; }
+    else { btn.disabled = false; btn.textContent = 'Publish'; }
   }
   function closePublishPopover() {
     var pop = document.getElementById('asm-publish-popover');

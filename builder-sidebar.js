@@ -72,7 +72,11 @@
     // Notifications preview tab is disabled in the prototype — tooltip on hover.
     '.asm-notif-disabled{position:relative;cursor:default !important;}' +
     '.asm-notif-disabled::after{content:"Not part of this prototype";position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(-2px);background:#1a1a1a;color:#fff;font-size:12px;font-weight:500;line-height:1;padding:7px 10px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s,transform .12s;box-shadow:0 4px 14px rgba(0,0,0,0.18);z-index:300;}' +
-    '.asm-notif-disabled:hover::after{opacity:1;transform:translateX(-50%) translateY(0);}';
+    '.asm-notif-disabled:hover::after{opacity:1;transform:translateX(-50%) translateY(0);}' +
+    // Workspace switcher isn't built for the prototype — tooltip on hover.
+    '.asm-sb .ws[data-asm-tip]{position:relative;cursor:default;}' +
+    '.asm-sb .ws[data-asm-tip]::after{content:attr(data-asm-tip);position:absolute;top:calc(100% + 6px);left:8px;background:#1a1a1a;color:#fff;font-size:12px;font-weight:500;line-height:1;padding:7px 10px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;box-shadow:0 4px 14px rgba(0,0,0,0.18);z-index:300;}' +
+    '.asm-sb .ws[data-asm-tip]:hover::after{opacity:1;}';
 
   function ensureStyle() {
     if (document.getElementById(STYLE_ID)) return;
@@ -179,7 +183,7 @@
     // data-asm-brand-applied trips the bundle override's global guard so its
     // ensureBrandMagesLogo() never rewrites our workspace avatar.
     return '<div class="asm-sb" data-asm-brand-applied="1">' +
-      '<div class="ws"><div class="ws-avatar">' + initial + '</div><span class="ws-name">' + co + '</span><img class="ws-caret-img" src="assets/chevron.svg" alt="" width="12" height="12" /></div>' +
+      '<div class="ws" data-asm-tip="Not part of this prototype"><div class="ws-avatar">' + initial + '</div><span class="ws-name">' + co + '</span><img class="ws-caret-img" src="assets/chevron.svg" alt="" width="12" height="12" /></div>' +
       '<nav class="nav">' +
         '<a class="nav-item" data-nav="crm.html"><img class="ic" src="assets/crm.svg" alt="" width="16" height="16" />CRM</a>' +
         '<a class="nav-item" data-nav="team.html"><img class="ic" src="assets/team.svg" alt="" width="18" height="18" />Team</a>' +
