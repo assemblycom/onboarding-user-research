@@ -13,9 +13,6 @@
   var LIVE = '[data-nav],[data-live],.open-portal,.checklist-item,.tab,' +
     '.start-btn,#startBuilding,.template-card,.ac-chip,.ac-item,.ac-arrow,' +
     '.studio-primary,.studio-google,.studio-theme';
-  // Interactive-looking things that are decorative in this prototype.
-  var INTERACTIVE = 'button,[role="button"],.btn-dark,.icon-btn,.row-actions,' +
-    '.chip,tbody tr,.cell-name,.preview-tab,.asset-thumb';
 
   function isLive(el) {
     if (el.closest(LIVE)) return true;
@@ -23,6 +20,16 @@
     if (a) { var h = a.getAttribute('href'); if (h && h !== '#' && h !== '') return true; }
     if (el.closest('#appCategories')) return true;
     return false;
+  }
+
+  // Anything the page styles as clickable (cursor:pointer) but that isn't a
+  // wired-up control is treated as decorative. This auto-covers every page's
+  // bespoke toggles/rows/buttons without maintaining a selector list.
+  function isHintable(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (el === tip || (tip && tip.contains(el))) return false;
+    if (getComputedStyle(el).cursor !== 'pointer') return false;
+    return !isLive(el);
   }
 
   var STYLE_ID = 'proto-hint-style';
@@ -61,8 +68,7 @@
   function hide() { if (visible) { tip.style.display = 'none'; visible = false; } }
 
   document.addEventListener('mousemove', function (e) {
-    var el = e.target.closest && e.target.closest(INTERACTIVE);
-    if (el && !isLive(el)) show(e.clientX, e.clientY);
+    if (isHintable(e.target)) show(e.clientX, e.clientY);
     else hide();
   });
   document.addEventListener('mouseleave', hide);
