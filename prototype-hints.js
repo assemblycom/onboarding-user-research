@@ -12,7 +12,9 @@
   // Things that actually do something — never hint these.
   var LIVE = '[data-nav],[data-live],.open-portal,.checklist-item,.tab,' +
     '.start-btn,#startBuilding,.template-card,.ac-chip,.ac-item,.ac-arrow,' +
-    '.studio-primary,.studio-google,.studio-theme';
+    '.studio-primary,.studio-google,.studio-theme,' +
+    // FTUX flows are real, working modals — never hint inside them.
+    '.pi-ov,.inv-overlay';
 
   function isLive(el) {
     if (el.closest(LIVE)) return true;
