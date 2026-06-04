@@ -584,7 +584,6 @@
     const TAKEN = ['acme', 'demo', 'test', 'studio', 'admin', 'app', 'client', 'portal', 'rocket'];
     const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const CROSS = '<img src="assets/circle-x.svg" width="20" height="20" alt="" />';
-    let edited = false;
     const slug = s => s.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
     function evalAvail() {
       const v = sub.value.trim().toLowerCase();
@@ -600,8 +599,8 @@
         ind.classList.add('ok'); ind.innerHTML = CHECK;
       }
     }
-    coInput.addEventListener('input', () => { if (!edited) { sub.value = slug(coInput.value); evalAvail(); } });
-    sub.addEventListener('input', () => { edited = true; evalAvail(); });
+    coInput.addEventListener('input', () => { sub.value = slug(coInput.value); evalAvail(); });
+    sub.addEventListener('input', evalAvail);
   })();
 
   // Resolve the absolute URL of a sibling file ("builder", etc.) in
