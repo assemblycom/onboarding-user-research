@@ -459,6 +459,9 @@
       host: document.getElementById('appCategories'),
       fade: '#F5F5F0',
       arrowColor: 'rgba(26,26,26,0.55)',
+      chipRadius: '12px',
+      cardRadius: '12px',
+      icRadius: '8px',
       onSelect: function (item) {
         if (promptInput) { promptInput.value = item.prompt; promptInput.dispatchEvent(new Event('input')); promptInput.focus(); }
       }
