@@ -166,19 +166,26 @@
       panel.style.maxHeight = '0px';
     }
 
+    function closeActive() {
+      if (!activeId) return;
+      activeId = null;
+      scroller.querySelectorAll('.ac-chip').forEach(function (c) { c.classList.remove('is-active'); });
+      closePanel();
+    }
+
     function toggle(cat, chip) {
-      if (activeId === cat.id) {
-        activeId = null;
-        chip.classList.remove('is-active');
-        closePanel();
-        return;
-      }
+      if (activeId === cat.id) { closeActive(); return; }
       activeId = cat.id;
       scroller.querySelectorAll('.ac-chip').forEach(function (c) { c.classList.remove('is-active'); });
       chip.classList.add('is-active');
       renderItems(cat);
       openPanel();
     }
+
+    // Clicking anywhere outside the control closes the open dropdown.
+    document.addEventListener('mousedown', function (e) {
+      if (activeId && !host.contains(e.target)) closeActive();
+    });
 
     function updateArrows() {
       var max = scroller.scrollWidth - scroller.clientWidth;
