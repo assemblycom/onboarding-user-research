@@ -66,16 +66,14 @@
     .exit-preview:hover { background: #000; }
     .exit-preview svg { width: 14px; height: 14px; }
 
-    /* First-visit interstitial — shown once before entering the client view. */
-    .intro { display: none; position: fixed; inset: 0; z-index: 200; background: #fff; }
+    /* First-visit interstitial — centered modal shown once before entering. */
+    .intro { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.42); align-items: center; justify-content: center; padding: 24px; }
     html.show-portal-intro .intro { display: flex; }
-    .intro-left { flex: 1; display: flex; flex-direction: column; padding: 72px; max-width: 760px; }
-    .intro-title { font-size: 30px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.2; margin: 0 0 18px; color: var(--text); }
-    .intro-copy { font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 540px; margin: 0; }
-    .intro-btn { align-self: flex-start; margin-top: auto; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 12px 20px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+    .intro-card { width: 460px; max-width: 100%; background: #fff; border-radius: 16px; padding: 28px 28px 24px; box-shadow: 0 24px 70px rgba(0,0,0,0.28); }
+    .intro-title { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; line-height: 1.25; margin: 0 0 12px; color: var(--text); }
+    .intro-copy { font-size: 14px; line-height: 1.6; color: var(--muted); margin: 0 0 22px; }
+    .intro-btn { width: 100%; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 12px 20px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
     .intro-btn:hover { background: #000; }
-    .intro-right { flex: 1; background: #f3f4ef; border-left: 1px solid var(--border); }
-    @media (max-width: 760px) { .intro-right { display: none; } .intro-left { max-width: none; padding: 40px 28px; } }
   </style>
   <script>(function(){ try { if (!localStorage.getItem('onb.portalIntroSeen')) document.documentElement.classList.add('show-portal-intro'); } catch (e) { document.documentElement.classList.add('show-portal-intro'); } })();</script>
 </head>
@@ -137,12 +135,11 @@
 
   <!-- First-visit interstitial -->
   <div class="intro" id="portalIntro">
-    <div class="intro-left">
+    <div class="intro-card">
       <h1 class="intro-title">Explore client experience</h1>
       <p class="intro-copy">We've created a test client using your signup email. When you launch the client experience, you'll authenticate as that client and see exactly what they see.</p>
       <button class="intro-btn" id="introLaunch" type="button">Launch client view</button>
     </div>
-    <div class="intro-right"></div>
   </div>
 
   <script>
