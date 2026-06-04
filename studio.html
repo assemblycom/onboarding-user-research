@@ -68,34 +68,63 @@
     .content { max-width: 740px; margin: 0 auto; width: 100%; padding: 64px 24px 60px; }
     .greeting { font-size: 26px; font-weight: 500; letter-spacing: -0.01em; margin: 0 0 18px; }
 
-    .promptbox { border: 1px solid var(--border); border-radius: 14px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; }
-    .promptbox:focus-within { border-color: #b9bcc1; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .promptbox { border: 1.5px solid transparent; border-radius: 14px; background: linear-gradient(#fff,#fff) padding-box, linear-gradient(150deg, #c2caf0 0%, #d9ed92 100%) border-box; box-shadow: 0 1px 2px rgba(0,0,0,0.03); overflow: hidden; transition: box-shadow 0.15s; }
+    .promptbox:focus-within { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
     .promptbox textarea { width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 15px; line-height: 1.55; color: var(--text); padding: 16px 18px 6px; min-height: 70px; max-height: 240px; background: transparent; }
     .promptbox textarea::placeholder { color: #9aa0a6; }
     .promptbox-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 12px; }
     .attach { width: 30px; height: 30px; border: none; background: transparent; border-radius: 8px; color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .attach:hover { background: var(--bg-hover); }
-    .start-btn { background: var(--dark); color: #fff; border: none; border-radius: 8px; padding: 9px 16px; font-family: inherit; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
-    .start-btn:hover { opacity: 0.88; }
+    /* Send button: solid dark square, same fill as the portal's dark buttons. */
+    .start-btn { width: 34px; height: 34px; flex-shrink: 0; background: var(--dark); color: #fff; border: none; border-radius: 9px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.15s; }
+    .start-btn svg { width: 16px; height: 16px; }
+    .start-btn:not(:disabled):hover { opacity: 0.88; }
 
-    .chips { display: flex; gap: 8px; margin-top: 16px; flex-wrap: nowrap; overflow: hidden; }
-    .chip { flex-shrink: 0; font-size: 13px; color: var(--text); background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 7px 13px; cursor: pointer; font-family: inherit; transition: background 0.12s, border-color 0.12s; }
+    /* Single row, but scroll instead of clipping when it doesn't fit. */
+    .chips { display: flex; gap: 8px; margin-top: 16px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { flex-shrink: 0; font-size: 13px; color: var(--text); background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 7px 13px; cursor: pointer; font-family: inherit; transition: background 0.12s, border-color 0.12s; }
     .chip:hover { background: var(--bg-soft); border-color: #c7ccd3; }
     .chip-more { width: 34px; padding: 7px 0; display: flex; align-items: center; justify-content: center; color: var(--muted); }
 
     /* Templates */
     .templates { max-width: 1180px; margin: 0 auto; width: 100%; padding: 36px 24px 60px; }
     .templates-panel { border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px 26px; }
-    .templates-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .templates-head { margin-bottom: 18px; }
     .templates-title { font-size: 15px; font-weight:500; }
-    .templates-nav { display: flex; gap: 8px; }
-    .templates-nav button { width: 30px; height: 30px; border: 1px solid var(--border); background: #fff; border-radius: 8px; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .templates-nav button:hover { background: var(--bg-hover); }
-    .template-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 18px; }
-    .template-card { cursor: pointer; }
-    .template-thumb { border: 1px solid var(--border); border-radius: 12px; height: 138px; background: var(--bg-soft); display: flex; align-items: center; justify-content: center; color: #aab0b8; font-size: 12px; font-weight: 500; letter-spacing: 0.02em; }
-    .template-name { font-size: 14px; font-weight:500; margin: 12px 0 4px; }
-    .template-desc { font-size: 13px; color: var(--muted); line-height: 1.45; }
+    /* Auto-fitting columns so cards reflow (4-ish wide → 2 → 1) instead of clipping. */
+    .template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 16px; }
+    /* Remix card: framed app screenshot that bleeds into a soft gray header,
+       with the name + description below. */
+    .template-card { display: flex; flex-direction: column; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s; }
+    .template-card:hover { border-color: #c9cdd4; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .template-top { background: #eff1f4; border-bottom: 1px solid var(--border); padding: 12px 12px 0; }
+    .template-thumb { height: 116px; border-radius: 2px 2px 0 0; overflow: hidden; }
+    .template-thumb img { width: 100%; height: 116px; object-fit: cover; object-position: top; display: block; }
+    .template-body { padding: 8px 12px; }
+    .template-name { font-size: 13px; font-weight: 500; line-height: 21px; color: var(--text); }
+    .template-desc { font-size: 12px; line-height: 20px; color: var(--muted); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* ── Responsive ── */
+    /* Tablet: tighten the wide template gutter so cards keep their size. */
+    @media (max-width: 1024px) {
+      .templates { padding: 28px 24px 56px; }
+    }
+    /* Narrow / mobile: drop the sidebar so the build flow gets the full width,
+       and pull in the generous desktop paddings. */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .topbar, .tabs { padding: 0 18px; }
+      .content { padding: 36px 18px 40px; }
+      .greeting { font-size: 22px; margin-bottom: 16px; }
+      .templates { padding: 24px 18px 48px; }
+      .templates-panel { padding: 18px 16px 22px; }
+      .templates-head { margin-bottom: 14px; }
+    }
+    @media (max-width: 420px) {
+      .promptbox textarea { font-size: 14px; }
+      .greeting { font-size: 20px; }
+    }
   </style>
 </head>
 <body>
@@ -127,7 +156,7 @@
 
       <div class="checklist">
         <div class="checklist-title">Getting started</div>
-        <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Publish your first app</div>
+        <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Add your first app</div>
         <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Explore the client experience</div>
         <div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Invite your team</div>
       </div>
@@ -156,45 +185,26 @@
             <textarea id="buildPrompt" rows="2" placeholder="Describe the app you want to build for your clients…"></textarea>
             <div class="promptbox-bar">
               <button class="attach" title="Attach"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
-              <button class="start-btn" id="startBuilding" type="button">Start Building</button>
+              <button class="start-btn" id="startBuilding" type="button" aria-label="Start building"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
             </div>
           </div>
 
-          <div class="chips" id="chips">
-            <button class="chip" data-prompt="A client onboarding flow with intake forms, e-signatures, and document upload">Onboarding</button>
-            <button class="chip" data-prompt="A client dashboard showing project status, recent activity, and key metrics">Dashboard</button>
-            <button class="chip" data-prompt="An approvals workflow where clients review and sign off on deliverables">Approvals</button>
-            <button class="chip" data-prompt="A request intake app where clients submit and track requests">Requests</button>
-            <button class="chip" data-prompt="A proposal builder to create, send, and track client proposals">Proposals</button>
-            <button class="chip" data-prompt="An AI assistant that answers client questions from my knowledge base">AI Assistants</button>
-          </div>
+          <div id="appCategories" style="margin-top:22px"></div>
         </div>
 
         <div class="templates">
           <div class="templates-panel">
             <div class="templates-head">
               <div class="templates-title">Remix from app templates</div>
-              <div class="templates-nav">
-                <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-                <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
-              </div>
             </div>
-            <div class="template-grid">
-              <div class="template-card"><div class="template-thumb">Placeholder</div><div class="template-name">Placeholder</div><div class="template-desc">Placeholder description for this template card.</div></div>
-              <div class="template-card"><div class="template-thumb">Placeholder</div><div class="template-name">Placeholder</div><div class="template-desc">Placeholder description for this template card.</div></div>
-              <div class="template-card"><div class="template-thumb">Placeholder</div><div class="template-name">Placeholder</div><div class="template-desc">Placeholder description for this template card.</div></div>
-              <div class="template-card"><div class="template-thumb">Placeholder</div><div class="template-name">Placeholder</div><div class="template-desc">Placeholder description for this template card.</div></div>
-              <div class="template-card"><div class="template-thumb">Placeholder</div><div class="template-name">Placeholder</div><div class="template-desc">Placeholder description for this template card.</div></div>
-              <div class="template-card"><div class="template-thumb">Placeholder</div><div class="template-name">Placeholder</div><div class="template-desc">Placeholder description for this template card.</div></div>
-              <div class="template-card"><div class="template-thumb">Placeholder</div><div class="template-name">Placeholder</div><div class="template-desc">Placeholder description for this template card.</div></div>
-              <div class="template-card"><div class="template-thumb">Placeholder</div><div class="template-name">Placeholder</div><div class="template-desc">Placeholder description for this template card.</div></div>
-            </div>
+            <div class="template-grid" id="templateGrid"></div>
           </div>
         </div>
       </div>
     </main>
   </div>
 
+  <script src="app-categories.js"></script>
   <script>
     // Read the prompt passed from the marketing site / chip selection (#prompt=…)
     function getHashParam(name) {
@@ -242,7 +252,7 @@
     }
 
     // A prompt (typed, chip-selected, or carried from the website) flips the
-    // "Publish your first app" FTUX item from todo to in-progress.
+    // "Add your first app" FTUX item from todo to in-progress.
     function markPromptEntered() {
       if (window.ftuxMarkPublishProgress) { window.ftuxMarkPublishProgress(); return; }
       try { var s = JSON.parse(localStorage.getItem('onb.ftux')) || {}; if (!s.publish) { s.publish = 'progress'; localStorage.setItem('onb.ftux', JSON.stringify(s)); } } catch (e) {}
@@ -256,16 +266,60 @@
 
     promptField.addEventListener('input', () => { autosize(); updateStart(); if (promptField.value.trim()) markPromptEntered(); });
 
-    // Chips below let them pick a starting prompt if they didn't type one
-    document.querySelectorAll('#chips .chip[data-prompt]').forEach(chip => {
-      chip.addEventListener('click', () => {
-        promptField.value = chip.dataset.prompt;
-        autosize();
-        updateStart();
-        markPromptEntered();
-        promptField.focus();
+    // Category chips below open a dropdown of related starter apps; picking one
+    // fills the prompt (same effect the old single-prompt chips had).
+    if (window.AppCategories) {
+      window.AppCategories.mount({
+        host: document.getElementById('appCategories'),
+        onSelect: function (item) {
+          promptField.value = item.prompt;
+          autosize();
+          updateStart();
+          markPromptEntered();
+          promptField.focus();
+        }
       });
-    });
+    }
+
+    // Remix-from-templates gallery. Drop screenshots into assets/templates/
+    // matching the `img` paths below; until then the soft gray header shows.
+    const TEMPLATES = [
+      { name: 'Proposal Builder', desc: 'Create, send, and track client proposals', img: 'assets/templates/proposal-builder.png', prompt: 'A proposal builder to create, send, and track client proposals' },
+      { name: 'Time Tracker', desc: 'Log hours and review time across projects', img: 'assets/templates/time-tracker.png', prompt: 'A time tracker to log hours and review time across projects' },
+      { name: 'Pizza Tracker', desc: 'Real-time order status from kitchen to door', img: 'assets/templates/pizza-tracker.png', prompt: 'An order tracker showing real-time status from kitchen to door' },
+      { name: 'Client Dashboard', desc: 'A branded overview of status and activity', img: 'assets/templates/dashboard.png', prompt: 'A branded client dashboard with an overview of status and activity' },
+      { name: 'Appointments', desc: 'Let clients book and manage appointments', img: 'assets/templates/appointments.png', prompt: 'An appointments app where clients book and manage appointments' },
+      { name: 'Document Manager', desc: 'Organize, request, and share documents', img: 'assets/templates/documents.png', prompt: 'A document manager to organize, request, and share documents' },
+      { name: 'Order Tracker', desc: 'Track orders from request to delivery', img: 'assets/templates/orders.png', prompt: 'An order tracker that follows orders from request to delivery' },
+      { name: 'Invoices', desc: 'Send invoices and collect payments', img: 'assets/templates/invoices.png', prompt: 'An invoicing app to send invoices and collect payments' }
+    ];
+    (function renderTemplates() {
+      const grid = document.getElementById('templateGrid');
+      if (!grid) return;
+      TEMPLATES.forEach(function (t) {
+        const card = document.createElement('div');
+        card.className = 'template-card';
+        card.innerHTML =
+          '<div class="template-top"><div class="template-thumb">' +
+            '<img src="' + t.img + '" alt="" onerror="this.style.display=\'none\'" />' +
+          '</div></div>' +
+          '<div class="template-body">' +
+            '<div class="template-name"></div>' +
+            '<div class="template-desc"></div>' +
+          '</div>';
+        card.querySelector('.template-name').textContent = t.name;
+        card.querySelector('.template-desc').textContent = t.desc;
+        card.addEventListener('click', function () {
+          promptField.value = t.prompt;
+          autosize();
+          updateStart();
+          markPromptEntered();
+          promptField.focus();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        grid.appendChild(card);
+      });
+    })();
 
     // Start Building → kick off the existing build process (plan mode etc.)
     function startBuilding() {
@@ -279,5 +333,7 @@
     });
   </script>
   <script src="ftux.js"></script>
+  <script src="apps-nav.js"></script>
+  <script src="prototype-hints.js?v=3"></script>
 </body>
 </html>

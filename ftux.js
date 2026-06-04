@@ -23,13 +23,15 @@
     css.textContent =
       '.ftux-bar{height:4px;border-radius:99px;background:#e7e9ec;overflow:hidden;margin:0 0 12px;}' +
       '.ftux-bar-fill{height:100%;background:#1a1a1a;border-radius:99px;transition:width .35s ease;}' +
-      '.checklist-item{cursor:pointer;border-radius:6px;margin:0 -6px;padding:6px 6px;transition:background .12s;}' +
+      '.checklist-item{cursor:pointer;border-radius:6px;margin:0;padding:6px 2px 6px 0;gap:8px;transition:background .12s;}' +
       '.checklist-item:hover{background:var(--bg-hover,#eff1f4);}' +
       '.checklist-item.ftux-done{color:#8a9099;}' +
+      '.checklist-item img{flex-shrink:0;}' +
+      '.ci-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
       '.inv-overlay{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.42);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;font-family:Inter,system-ui,sans-serif;}' +
       '.inv-overlay.show{opacity:1;pointer-events:auto;}' +
       '.inv-modal{width:448px;max-width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,0.28);max-height:90vh;display:flex;flex-direction:column;}' +
-      '.inv-banner{height:150px;flex-shrink:0;background:linear-gradient(135deg,#eef0fb 0%,#e8eee0 60%,#f6e5e6 100%);}' +
+      '.inv-banner{height:150px;flex-shrink:0;background:#aeb8e8;}' +
       '.inv-body{padding:22px 22px 0;overflow-y:auto;color:#212b36;}' +
       '.inv-title{font-size:18px;font-weight:500;margin:0 0 6px;}' +
       '.inv-sub{font-size:13.5px;color:#6b6f76;line-height:1.5;margin:0 0 18px;}' +
@@ -85,11 +87,23 @@
   function ensureModal() {
     var ov = document.querySelector('.inv-overlay');
     if (ov) return ov;
+    // Suggested teammates use generic names and emails on the user's own
+    // domain (from their signup email) — or the company domain for Google /
+    // personal-email signups.
+    var inviteDomain = (function () {
+      var COMMON = ['gmail.com', 'googlemail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'icloud.com', 'live.com', 'aol.com', 'proton.me'];
+      var email = hashParam('email');
+      if (email && email.indexOf('@') > -1) {
+        var d = email.split('@')[1].toLowerCase().trim();
+        if (d && COMMON.indexOf(d) === -1) return d;
+      }
+      var co = (hashParam('company') || 'Studio').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      return (co || 'studio') + '.com';
+    })();
     var people = [
-      ['Neil Raina', 'neil@assembly.com'], ['Adam Schwartz', 'adam@assembly.com'],
-      ['Dovid Baum', 'dovid@assembly.com'], ['Amelia Riely', 'amelia@assembly.com'],
-      ['Ellie Spigelman', 'ellie@assembly.com']
-    ];
+      ['Jordan Lee', 'jordan'], ['Sam Carter', 'sam'], ['Riley Chen', 'riley'],
+      ['Taylor Brooks', 'taylor'], ['Morgan Diaz', 'morgan']
+    ].map(function (p) { return [p[0], p[1] + '@' + inviteDomain]; });
     function initials(n) { var p = n.trim().split(/\s+/); return ((p[0] ? p[0][0] : '') + (p[1] ? p[1][0] : '')).toUpperCase(); }
     var listHtml = people.map(function (p) { var c = avc(p[0]); return '<div class="inv-person"><span class="inv-av" style="background:' + c[0] + ';color:' + c[1] + '">' + initials(p[0]) + '</span><div><div class="inv-nm">' + p[0] + '</div><div class="inv-em">' + p[1] + '</div></div></div>'; }).join('');
     ov = document.createElement('div');
@@ -229,6 +243,15 @@
     items.forEach(function (it, i) {
       if (it.getAttribute('data-ftux-bound') === '1') return;
       var clone = it.cloneNode(true); // strip any prior click handlers
+      // Wrap the bare label text so it truncates with an ellipsis when tight.
+      [].slice.call(clone.childNodes).forEach(function (node) {
+        if (node.nodeType === 3 && node.textContent.trim() && !clone.querySelector('.ci-label')) {
+          var span = document.createElement('span');
+          span.className = 'ci-label';
+          span.textContent = node.textContent.trim();
+          clone.replaceChild(span, node);
+        }
+      });
       it.parentNode.replaceChild(clone, it);
       clone.setAttribute('data-ftux-bound', '1');
       clone.addEventListener('click', function () {

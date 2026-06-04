@@ -50,8 +50,12 @@
     '#asm-components-link{display:none !important;}' +
     // Off-white cover that hides the bundle's default render until our sidebar
     // is in place — prevents the "BrandMages" flash on load.
-    '#asm-load-cover{position:fixed;inset:0;z-index:9998;background:#FBFBF5;transition:opacity .25s ease;}' +
-    '#asm-load-cover.asm-hide{opacity:0;pointer-events:none;}';
+    '#asm-load-cover{position:fixed;inset:0;z-index:9998;background:#FBFBF5;display:flex;align-items:center;justify-content:center;transition:opacity .3s ease;}' +
+    '#asm-load-cover.asm-hide{opacity:0;pointer-events:none;}' +
+    '.asm-load-inner{display:flex;flex-direction:column;align-items:center;gap:14px;}' +
+    '.asm-load-mark{width:38px;height:38px;animation:asmLoadPulse 1.4s ease-in-out infinite;}' +
+    ".asm-load-text{font-size:13px;color:#6b6f76;font-family:'Inter',system-ui,-apple-system,sans-serif;}" +
+    '@keyframes asmLoadPulse{0%,100%{opacity:0.4;transform:scale(0.97);}50%{opacity:1;transform:scale(1);}}';
 
   function ensureStyle() {
     if (document.getElementById(STYLE_ID)) return;
@@ -97,6 +101,17 @@
     return document.body && /version published/i.test(document.body.innerText);
   }
 
+  // Persist the current app so it stays in the sidebar on every other page —
+  // letting the user navigate away and click back into the build.
+  var lastPersist = '';
+  function persistApp() {
+    try {
+      var rec = { name: appTitle() || DRAFT_APP, status: isPublished() ? 'published' : 'draft', hash: location.hash || '' };
+      var json = JSON.stringify(rec);
+      if (json !== lastPersist) { localStorage.setItem('onb.buildApp', json); lastPersist = json; }
+    } catch (e) {}
+  }
+
   // Keep the draft entry's name in sync with the builder, and drop the
   // Draft badge once published.
   function syncDraft(host) {
@@ -107,6 +122,7 @@
       if (badge) badge.remove();
       if (window.ftuxMarkPublishDone) window.ftuxMarkPublishDone();
     }
+    persistApp();
   }
 
   function buildHTML() {
@@ -132,7 +148,7 @@
       '<div class="spacer"></div>' +
       '<div class="checklist">' +
         '<div class="checklist-title">Getting started</div>' +
-        '<div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Publish your first app</div>' +
+        '<div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Add your first app</div>' +
         '<div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Explore the client experience</div>' +
         '<div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Invite your team</div>' +
       '</div>' +
@@ -181,6 +197,9 @@
     if (document.getElementById('asm-load-cover')) return;
     var c = document.createElement('div');
     c.id = 'asm-load-cover';
+    c.innerHTML = '<div class="asm-load-inner">' +
+      '<img class="asm-load-mark" src="assets/studio-mark.svg" alt="" />' +
+      '<div class="asm-load-text">Setting up the builder…</div></div>';
     document.body.appendChild(c);
   }
   function removeCover() {

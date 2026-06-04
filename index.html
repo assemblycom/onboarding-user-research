@@ -216,33 +216,26 @@
     .cv-stack-dot { width:8px;height:8px;border-radius:50%;background:#D9ED92 }
   </style>
 </head>
-<body><div class="min-h-screen"><header class="fixed inset-x-0 z-50 px-3 md:px-4" style="top:12px"><div class="mx-auto flex max-w-6xl items-center justify-between gap-3 rounded-full border px-4 py-2.5 md:py-2 md:pl-5 md:pr-2" style="background-color:#efefed;border-color:rgba(0, 0, 0, 0.06);transform-origin:center center;will-change:transform, background-color, border-color, backdrop-filter, box-shadow"><span aria-label="Assembly Studio" class="inline-flex items-center" style="cursor:default"><img src="https://assembly-studio-waitlist.vercel.app/logos/web-logo.svg" alt="Assembly Studio" class="h-6 w-auto" style="filter:invert(1)"/></span><span class="hidden md:inline-flex items-center gap-1" style="opacity:1;pointer-events:auto;transform:none;will-change:opacity, transform"><button type="button" class="inline-flex items-center justify-center rounded-full px-4 py-2 text-[13px] font-medium text-[#1A1A1A]/70" style="cursor:default">Log in</button><button type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#D9ED92] px-4 py-2 text-[13px] font-medium text-[#101010] transition-all duration-200 hover:bg-[#C7DA86]" onclick="openAuthModal()">Start trial</button></span></div></header><div aria-hidden="true" class="pointer-events-none fixed inset-x-0 bottom-0 z-0 h-0" style="background-image:linear-gradient(180deg, #101010 0%, rgb(139,153,200) 55%, rgb(217,237,146) 100%);-webkit-mask-image:linear-gradient(to bottom, transparent 0%, black 10%, black 100%);mask-image:linear-gradient(to bottom, transparent 0%, black 10%, black 100%);will-change:height"></div><div class="relative z-10 bg-[var(--color-bg)]" style="will-change:transform"><div style="background-color:#F5F5F0"><div class="relative origin-top overflow-hidden bg-[var(--color-bg)]" style="will-change:transform, border-radius"><section class="mx-auto flex max-w-6xl flex-col px-6 pb-8 pt-32 md:pb-12 md:pt-40 xl:pt-52 2xl:pt-60" style="min-height:min(100vh, 920px)"><div class="flex flex-col items-center text-center"><h1 class="mb-6 max-w-[900px] text-[2.125rem] font-normal leading-[1.05] tracking-[-0.03em] text-[#1A1A1A] [text-wrap:balance] md:text-[3.25rem] md:tracking-[-0.035em]">The AI app builder for<br/>client-facing experiences</h1><p class="mb-8 max-w-[620px] text-[1.0625rem] leading-[1.55] text-[#1A1A1A]/55 [text-wrap:pretty]">Build apps in minutes, or pick from a library of pre-built ones. Each one deploys to your client portal and inherits your contacts, permissions, and preferences.</p><div id="prompt-box-wrap" style="width:100%;max-width:580px;margin:0 auto">
+<body><div class="min-h-screen"><header class="fixed inset-x-0 z-50 px-3 md:px-4" style="top:12px"><div class="mx-auto flex max-w-6xl items-center justify-between gap-3 rounded-full border px-4 py-2.5 md:py-2 md:pl-5 md:pr-2" style="background-color:#efefed;border-color:rgba(0, 0, 0, 0.06);transform-origin:center center;will-change:transform, background-color, border-color, backdrop-filter, box-shadow"><span aria-label="Assembly Studio" class="inline-flex items-center" style="cursor:default"><img src="https://assembly-studio-waitlist.vercel.app/logos/web-logo.svg" alt="Assembly Studio" class="h-6 w-auto" style="filter:invert(1)"/></span><span class="hidden md:inline-flex items-center gap-1" style="opacity:1;pointer-events:auto;transform:none;will-change:opacity, transform"><button type="button" class="inline-flex items-center justify-center rounded-full px-4 py-2 text-[13px] font-medium text-[#1A1A1A]/70" style="cursor:default">Log in</button><button type="button" class="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#D9ED92] px-4 py-2 text-[13px] font-medium text-[#101010] transition-all duration-200 hover:bg-[#C7DA86]" onclick="openAuthModal()">Start trial</button></span></div></header><div aria-hidden="true" class="pointer-events-none fixed inset-x-0 bottom-0 z-0 h-0" style="background-image:linear-gradient(180deg, #101010 0%, rgb(139,153,200) 55%, rgb(217,237,146) 100%);-webkit-mask-image:linear-gradient(to bottom, transparent 0%, black 10%, black 100%);mask-image:linear-gradient(to bottom, transparent 0%, black 10%, black 100%);will-change:height"></div><div class="relative z-10 bg-[var(--color-bg)]" style="will-change:transform"><div style="background-color:#F5F5F0"><div class="relative origin-top overflow-hidden bg-[var(--color-bg)]" style="will-change:transform, border-radius"><section class="mx-auto flex max-w-6xl flex-col px-6 pb-8 pt-32 md:pb-12 md:pt-40 xl:pt-52 2xl:pt-60" style="min-height:min(100vh, 920px)"><div class="flex flex-col items-center text-center"><h1 class="mb-6 max-w-[900px] text-[2.125rem] font-normal leading-[1.05] tracking-[-0.03em] text-[#1A1A1A] [text-wrap:balance] md:text-[3.25rem] md:tracking-[-0.035em]">The AI app builder for<br/>client-facing experiences</h1><p class="mb-8 max-w-[620px] text-[1.0625rem] leading-[1.55] text-[#1A1A1A]/55 [text-wrap:pretty]">Build apps in minutes, or pick from a library of pre-built ones. Each one deploys to your client portal and inherits your contacts, permissions, and preferences.</p><div id="prompt-box-wrap" style="width:100%;max-width:660px;margin:0 auto">
   <div id="promptCard" style="background:#ffffff;border:1px solid rgba(0,0,0,0.1);border-radius:20px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05)">
     <textarea id="promptInput" placeholder="Ask Assembly to create a client app that..." rows="2" style="width:100%;padding:18px 20px 10px;font-size:16px;color:#1A1A1A;background:transparent;border:none;outline:none;resize:none;min-height:88px;max-height:200px;line-height:1.5;font-family:inherit;"></textarea>
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px 12px">
       <button style="width:32px;height:32px;border:none;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(0,0,0,0.4)" title="Attach">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
       </button>
       <div style="display:flex;align-items:center;gap:6px">
-        <button style="width:32px;height:32px;border:none;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(0,0,0,0.4)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8"/></svg>
-        </button>
         <button id="sendBtn" disabled style="width:32px;height:32px;background:#D9ED92;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity 0.15s">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#101010" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
         </button>
       </div>
     </div>
   </div>
-  <div class="sample-chips" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px;padding:0 16px">
-    <button class="sample-chip" data-prompt="A client support center where clients submit tickets, browse help articles, and track request status" style="font-size:13px;color:rgba(0,0,0,0.55);background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.12);padding:5px 13px;border-radius:99px;cursor:pointer;font-family:inherit;transition:all 0.15s">Client Support Center</button>
-    <button class="sample-chip" data-prompt="A deliverable approval flow where clients review and sign off on work" style="font-size:13px;color:rgba(0,0,0,0.55);background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.12);padding:5px 13px;border-radius:99px;cursor:pointer;font-family:inherit;transition:all 0.15s">Deliverable approvals</button>
-    <button class="sample-chip" data-prompt="A project tracker with tasks, timelines, and client visibility into progress" style="font-size:13px;color:rgba(0,0,0,0.55);background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.12);padding:5px 13px;border-radius:99px;cursor:pointer;font-family:inherit;transition:all 0.15s">Project tracker</button>
-  </div>
+  <div id="appCategories" style="margin-top:14px"></div>
 </div><div class="mx-auto w-full max-w-[620px]" style="padding-top:130px"><div class="relative overflow-hidden" style="-webkit-mask-image:linear-gradient(to right, transparent 0, black 12%, black 88%, transparent 100%);mask-image:linear-gradient(to right, transparent 0, black 12%, black 88%, transparent 100%)" aria-label="Alpha users"><div class="logo-marquee-track flex w-max items-center gap-x-12 md:gap-x-16"><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Capital One</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Collective</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Ditto</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Heritage Law Partners</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Waymaker</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">ce</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">AURA</span></div></div><div class="flex-none"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">CEO Bankable</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Capital One</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Collective</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Ditto</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Heritage Law Partners</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">Waymaker</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">ce</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">AURA</span></div></div><div class="flex-none" aria-hidden="true"><div class="flex h-8 items-center justify-center"><span class="whitespace-nowrap text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 text-[#1A1A1A]/40 hover:text-[#1A1A1A]/80">CEO Bankable</span></div></div></div></div></div></section></div></div></div></div></body>
+<script src="app-categories.js"></script>
 <!-- Auth Modal -->
 <div class="studio-loader" id="studioLoader" hidden>
   <div class="sl-mark"><img src="assets/studio-mark.svg" alt="" /></div>
-  <div class="sl-spinner"></div>
   <div class="sl-text" id="slText">Setting up your workspace…</div>
 </div>
 <div class="studio-auth" id="authOverlay">
@@ -370,7 +363,7 @@
             <div class="gauth-email">test.user@gmail.com</div>
           </div>
         </div>
-        <div class="gauth-acct" id="gauthAnother">
+        <div class="gauth-acct" id="gauthAnother" style="cursor:default;pointer-events:none;opacity:0.5">
           <div class="gauth-avatar gauth-avatar--ghost">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
           </div>
@@ -456,41 +449,26 @@
 
   if (sendBtn) sendBtn.addEventListener('click', () => { if (currentPrompt) openAuthModal(); });
 
-  document.querySelectorAll('.sample-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      if (promptInput) { promptInput.value = chip.dataset.prompt; promptInput.dispatchEvent(new Event('input')); promptInput.focus(); }
+  // Category chips → dropdown of related starter apps. Picking one fills the
+  // hero prompt (the user can then send it to start the trial / build).
+  if (window.AppCategories) {
+    window.AppCategories.mount({
+      host: document.getElementById('appCategories'),
+      fade: '#F5F5F0',
+      arrowColor: 'rgba(26,26,26,0.55)',
+      chipRadius: '12px',
+      cardRadius: '12px',
+      icRadius: '8px',
+      hoverBg: 'rgba(0,0,0,0.05)',
+      hoverBorder: 'rgba(0,0,0,0.18)',
+      activeBg: 'rgba(0,0,0,0.06)',
+      activeBorder: 'rgba(0,0,0,0.22)',
+      itemHoverBg: 'rgba(0,0,0,0.03)',
+      onSelect: function (item) {
+        if (promptInput) { promptInput.value = item.prompt; promptInput.dispatchEvent(new Event('input')); promptInput.focus(); }
+      }
     });
-  });
-
-  // ── Drag-to-scroll the sample-chip row with a mouse (the row scrolls by touch on mobile) ──
-  (function () {
-    const row = document.querySelector('.sample-chips');
-    if (!row) return;
-    const overflows = () => row.scrollWidth > row.clientWidth + 1;
-    const updateDraggable = () => row.classList.toggle('is-draggable', overflows());
-    updateDraggable();
-    window.addEventListener('resize', updateDraggable);
-
-    let isDown = false, startX = 0, startScroll = 0, moved = false;
-    row.addEventListener('mousedown', e => {
-      if (!overflows()) return;
-      isDown = true; moved = false;
-      startX = e.pageX; startScroll = row.scrollLeft;
-      row.classList.add('is-grabbing');
-      e.preventDefault();
-    });
-    window.addEventListener('mousemove', e => {
-      if (!isDown) return;
-      const dx = e.pageX - startX;
-      if (Math.abs(dx) > 4) moved = true;
-      row.scrollLeft = startScroll - dx;
-    });
-    window.addEventListener('mouseup', () => { isDown = false; row.classList.remove('is-grabbing'); });
-    // Suppress the chip's prompt-fill click when the press was actually a drag.
-    row.addEventListener('click', e => {
-      if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; }
-    }, true);
-  })();
+  }
 
   // ── Studio auth flow (two steps, then the build process) ──
   const authOverlay = document.getElementById('authOverlay');
@@ -572,17 +550,17 @@
     gauthLoading.hidden = false;
     setTimeout(() => {
       googleAuth.classList.remove('visible');
-      showAuthStep(3);
+      // Personalize/theme step is stashed for now — go straight to the builder.
+      goToBuilder();
     }, 1200);
   }
 
   document.getElementById('studioGoogle').addEventListener('click', openGoogleAuth);
   document.getElementById('gauthAcct').addEventListener('click', googleSignIn);
-  document.getElementById('gauthAnother').addEventListener('click', googleSignIn);
   // Click the dimmed backdrop to cancel back to the welcome step
   googleAuth.addEventListener('click', e => { if (e.target === googleAuth) googleAuth.classList.remove('visible'); });
-  // Step 2 (workspace details) Continue → personalize step (same as the Google flow)
-  document.getElementById('studioContinue2').addEventListener('click', e => { if (e.currentTarget.disabled) return; showAuthStep(3); });
+  // Step 2 (workspace details) Continue → builder. Personalize/theme step is stashed for now.
+  document.getElementById('studioContinue2').addEventListener('click', e => { if (e.currentTarget.disabled) return; goToBuilder(); });
 
   // Portal URL auto-derives from the company name (slug + .mystudio.com),
   // and shows an "Available" check once there's a subdomain.
@@ -650,7 +628,7 @@
     // Fresh signup → reset onboarding progress so a new user starts with a
     // clean Getting-started checklist (state lives in localStorage, which
     // would otherwise persist from a previous session in the same browser).
-    try { localStorage.removeItem('onb.ftux'); localStorage.removeItem('onb.portalIntroSeen'); } catch (e) {}
+    try { localStorage.removeItem('onb.ftux'); localStorage.removeItem('onb.portalIntroSeen'); localStorage.removeItem('onb.buildApp'); } catch (e) {}
     // Land on the in-portal "Add App" build page first. The prompt the
     // user typed (or chose via a chip) carries over and pre-fills the
     // field there; if they entered nothing the field starts empty.
