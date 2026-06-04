@@ -83,7 +83,33 @@
     // above (they sit at the bottom of the sidebar).
     '.asm-sb .icon-btn[data-asm-tip]{position:relative;cursor:default;}' +
     '.asm-sb .icon-btn[data-asm-tip]::after{content:attr(data-asm-tip);position:absolute;bottom:calc(100% + 8px);left:0;background:#1a1a1a;color:#fff;font-size:12px;font-weight:500;line-height:1;padding:7px 10px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;box-shadow:0 4px 14px rgba(0,0,0,0.18);z-index:300;}' +
-    '.asm-sb .icon-btn[data-asm-tip]:hover::after{opacity:1;}';
+    '.asm-sb .icon-btn[data-asm-tip]:hover::after{opacity:1;}' +
+    // ── Service Request Intake app preview (hand-built, Assembly UI) ──
+    // Injected over the bundle's preview pane so the built app reads as a
+    // service-request intake instead of the Time Tracker artboard.
+    ".asm-sri-app{display:flex;flex-direction:column;height:100%;background:#fff;font-family:'Inter',system-ui,-apple-system,sans-serif;color:#212b36;overflow:hidden;letter-spacing:normal;}" +
+    '.asm-sri-app *{box-sizing:border-box;}' +
+    '.asm-sri-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;flex-shrink:0;}' +
+    '.asm-sri-title{font-size:17px;font-weight:500;letter-spacing:-0.01em;}' +
+    '.asm-sri-new{display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;color:#fff;border:0;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;}' +
+    '.asm-sri-tabs{display:flex;gap:18px;padding:0 20px;border-bottom:1px solid #dfe1e4;flex-shrink:0;}' +
+    '.asm-sri-tab{padding:8px 2px;font-size:13.5px;color:#6b6f76;border-bottom:1.5px solid transparent;margin-bottom:-1px;cursor:pointer;}' +
+    '.asm-sri-tab.active{color:#212b36;font-weight:500;border-bottom-color:#1a1a1a;}' +
+    '.asm-sri-body{flex:1;overflow:auto;padding:8px 16px 16px;}' +
+    '.asm-sri-table{width:100%;border-collapse:collapse;}' +
+    '.asm-sri-table th{text-align:left;font-size:11px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;color:#6b6f76;padding:12px 12px 10px;border-bottom:1px solid #dfe1e4;white-space:nowrap;}' +
+    '.asm-sri-table td{padding:11px 12px;border-bottom:1px solid #eceef1;font-size:13px;color:#212b36;vertical-align:middle;}' +
+    '.asm-sri-table tbody tr:last-child td{border-bottom:0;}' +
+    '.asm-sri-table tbody tr:hover{background:#f8f9fb;}' +
+    '.asm-sri-req{font-weight:500;}' +
+    '.asm-sri-muted{color:#6b6f76;}' +
+    '.asm-sri-prio{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;}' +
+    '.asm-sri-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}' +
+    '.asm-sri-badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap;}' +
+    '.asm-sri-badge.open{background:#e1edff;color:#2456c7;}' +
+    '.asm-sri-badge.review{background:#fdeccb;color:#946200;}' +
+    '.asm-sri-badge.resolved{background:#d8f0df;color:#1d7a45;}' +
+    '.asm-sri-badge.closed{background:#eceef1;color:#6b6f76;}';
 
   function ensureStyle() {
     if (document.getElementById(STYLE_ID)) return;
@@ -329,11 +355,107 @@
     }
   }
 
+  // Hand-built Service Request Intake app preview (Assembly UI). Replaces the
+  // bundle's Time Tracker artboard in the preview pane so the built app reads
+  // as a service-request intake. Re-applied each tick (survives re-renders).
+  var SRI_ROWS = [
+    ['Login page won’t load', 'Meridian Corp', 'Bug', 'Apr 10', 'High', 'open', 'Open'],
+    ['Onboard new team member', 'Oakwood LLC', 'Onboarding', 'Apr 10', 'Normal', 'review', 'In review'],
+    ['Update billing contact', 'Meridian', 'Account', 'Apr 9', 'Normal', 'resolved', 'Resolved'],
+    ['Export account data', '—', 'Data', 'Apr 9', 'Low', 'open', 'Open'],
+    ['Integration not syncing', 'Bloom Studios', 'Bug', 'Apr 9', 'High', 'review', 'In review'],
+    ['Add 5 user seats', 'NovaTech Inc', 'Account', 'Apr 8', 'Normal', 'resolved', 'Resolved'],
+    ['Reset team passwords', 'Bloom Studios', 'Security', 'Apr 8', 'High', 'resolved', 'Resolved'],
+    ['Question about an invoice', 'NovaTech Inc', 'Billing', 'Apr 7', 'Low', 'closed', 'Closed']
+  ];
+  var PRIO_COLOR = { High: '#d9634a', Normal: '#c69b3c', Low: '#9aa0a6' };
+  function sriAppHTML() {
+    var rows = SRI_ROWS.map(function (r) {
+      return '<tr><td class="asm-sri-req">' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td>' +
+        '<td class="asm-sri-muted">' + r[3] + '</td>' +
+        '<td><span class="asm-sri-prio"><span class="asm-sri-dot" style="background:' + (PRIO_COLOR[r[4]] || '#9aa0a6') + '"></span>' + r[4] + '</span></td>' +
+        '<td><span class="asm-sri-badge ' + r[5] + '">' + r[6] + '</span></td></tr>';
+    }).join('');
+    return '<div class="asm-sri-app">' +
+      '<div class="asm-sri-head"><div class="asm-sri-title">Service Requests</div>' +
+        '<button class="asm-sri-new" type="button">+ New request</button></div>' +
+      '<div class="asm-sri-tabs"><div class="asm-sri-tab active">My queue</div><div class="asm-sri-tab">Team</div><div class="asm-sri-tab">All requests</div></div>' +
+      '<div class="asm-sri-body"><table class="asm-sri-table"><thead><tr>' +
+        '<th>Request</th><th>Client</th><th>Type</th><th>Submitted</th><th>Priority</th><th>Status</th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    '</div>';
+  }
+  // Find the bundle's app-preview card: the smallest visible container in the
+  // right pane that holds both the "Time Tracker" title and the table.
+  function findAppCard() {
+    var els = document.querySelectorAll('h1,h2,h3,div,span');
+    for (var i = 0; i < els.length; i++) {
+      var e = els[i];
+      var own = '';
+      for (var c = 0; c < e.childNodes.length; c++) { if (e.childNodes[c].nodeType === 3) own += e.childNodes[c].textContent; }
+      if (own.trim() !== 'Time Tracker') continue;
+      var r = e.getBoundingClientRect();
+      if (r.width === 0 || r.left < 320) continue; // hidden VH modal or left chrome
+      var node = e;
+      for (var d = 0; d < 9 && node.parentElement; d++) {
+        node = node.parentElement;
+        if (/\+\s*Log time/.test(node.textContent) && /Description/.test(node.textContent)) return node;
+      }
+    }
+    return null;
+  }
+  // Which preview tab is active (Dashboard/Portal/Notifications) — the active
+  // one carries a non-transparent background (we tint it #eff1f4).
+  function activePreviewTab() {
+    var active = null;
+    var btns = document.querySelectorAll('button');
+    for (var i = 0; i < btns.length; i++) {
+      var b = btns[i];
+      var txt = b.textContent.trim();
+      if (txt !== 'Dashboard' && txt !== 'Portal' && txt !== 'Notifications') continue;
+      var st = b.getAttribute('style') || '';
+      if (st.indexOf('padding: 4px 10px') === -1) continue;
+      var bg = getComputedStyle(b).backgroundColor;
+      if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') active = txt;
+    }
+    return active;
+  }
+
+  // Overlay (not innerHTML replace) so we never fight the bundle's React
+  // reconciliation. Only shown on the Dashboard preview tab — the wide
+  // client-portal artboard (Portal tab) lays out differently.
+  function injectSriApp() {
+    var ov = document.getElementById('asm-sri-overlay');
+    var tab = activePreviewTab();
+    var card = (tab === null || tab === 'Dashboard') ? findAppCard() : null;
+    if (!card) { if (ov) ov.style.display = 'none'; return; }
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'asm-sri-overlay';
+      ov.innerHTML = sriAppHTML();
+      document.body.appendChild(ov);
+    }
+    var r = card.getBoundingClientRect();
+    var radius = getComputedStyle(card).borderRadius || '0px';
+    // Clamp the left edge to the preview pane (the Dashboard tab marks it) so
+    // the overlay never bleeds over the chat at wide viewports.
+    var left = r.left;
+    var dashTab = null, btns = document.querySelectorAll('button');
+    for (var i = 0; i < btns.length; i++) {
+      if (btns[i].textContent.trim() === 'Dashboard' && (btns[i].getAttribute('style') || '').indexOf('padding: 4px 10px') > -1) { dashTab = btns[i]; break; }
+    }
+    if (dashTab) { var tr = dashTab.getBoundingClientRect(); if (tr.left - 16 > left) left = tr.left - 16; }
+    var width = Math.max(0, r.right - left);
+    ov.style.cssText = 'position:fixed;z-index:140;background:#fff;overflow:hidden;border-radius:' + radius +
+      ';left:' + left + 'px;top:' + r.top + 'px;width:' + width + 'px;height:' + r.height + 'px;display:block;';
+  }
+
   function apply() {
     ensureStyle();
     rebrandText();
     fixPreviewIcons();
     disableNotifTab();
+    injectSriApp();
     var sb = findBundleSidebar();
     if (!sb) { ensureCover(); return; }
     // Already replaced and still intact — just keep the draft entry in sync.
