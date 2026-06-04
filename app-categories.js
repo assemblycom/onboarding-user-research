@@ -78,13 +78,14 @@
     '.ac-chip{flex:0 0 auto;font-size:13px;font-weight:500;color:#1a1a1a;background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:8px;padding:8px 14px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .12s,border-color .12s;}' +
     '.ac-chip:hover{background:rgba(0,0,0,0.035);}' +
     '.ac-chip.is-active{background:#ececea;border-color:rgba(0,0,0,0.18);}' +
-    /* Arrows float over the scroller edges on a soft white fade (not a boxed
-       button), so chips slide smoothly underneath — hinting there is more. */
-    '.ac-arrow{position:absolute;top:0;bottom:0;width:52px;display:flex;align-items:center;border:none;background:transparent;padding:0;cursor:pointer;color:#1a1a1a;z-index:2;}' +
-    '.ac-prev{left:0;justify-content:flex-start;padding-left:1px;background:linear-gradient(to right, var(--ac-fade,#fff) 38%, rgba(255,255,255,0) 100%);}' +
-    '.ac-next{right:0;justify-content:flex-end;padding-right:1px;background:linear-gradient(to left, var(--ac-fade,#fff) 38%, rgba(255,255,255,0) 100%);}' +
+    /* The scroller itself is masked so chips fade softly to transparent at the
+       edges (set in JS per scroll position) — smooth regardless of chip color.
+       Arrows just float over that fade as a glyph, no hard band. */
+    '.ac-arrow{position:absolute;top:0;bottom:0;width:46px;display:flex;align-items:center;border:none;background:transparent;padding:0;cursor:pointer;color:#1a1a1a;z-index:2;}' +
+    '.ac-prev{left:0;justify-content:flex-start;}' +
+    '.ac-next{right:0;justify-content:flex-end;}' +
     '.ac-arrow.is-hidden{display:none;}' +
-    '.ac-arrow svg{width:17px;height:17px;filter:drop-shadow(0 0 5px var(--ac-fade,#fff)) drop-shadow(0 0 3px var(--ac-fade,#fff));}' +
+    '.ac-arrow svg{width:17px;height:17px;filter:drop-shadow(0 0 6px var(--ac-fade,#fff)) drop-shadow(0 0 3px var(--ac-fade,#fff));}' +
     '.ac-panel{overflow:hidden;max-height:0;opacity:0;transition:max-height .3s cubic-bezier(.4,0,.2,1),opacity .22s ease,margin-top .3s cubic-bezier(.4,0,.2,1);}' +
     '.ac-panel.is-open{opacity:1;margin-top:14px;}' +
     '.ac-card{border:1px solid rgba(0,0,0,0.1);border-radius:12px;background:#fff;overflow:hidden;}' +
@@ -189,8 +190,17 @@
 
     function updateArrows() {
       var max = scroller.scrollWidth - scroller.clientWidth;
-      prev.classList.toggle('is-hidden', scroller.scrollLeft <= 1);
-      next.classList.toggle('is-hidden', scroller.scrollLeft >= max - 1);
+      var atStart = scroller.scrollLeft <= 1;
+      var atEnd = scroller.scrollLeft >= max - 1;
+      prev.classList.toggle('is-hidden', atStart);
+      next.classList.toggle('is-hidden', atEnd);
+      // Fade the chips to transparent at any edge that can still scroll, so the
+      // row dissolves smoothly under the arrow instead of cutting off hard.
+      var l = atStart ? '0px' : '30px';
+      var r = atEnd ? '0px' : '58px';
+      var mask = 'linear-gradient(to right, transparent 0, #000 ' + l + ', #000 calc(100% - ' + r + '), transparent 100%)';
+      scroller.style.webkitMaskImage = mask;
+      scroller.style.maskImage = mask;
     }
     function scrollByStep(dir) {
       scroller.scrollBy({ left: dir * Math.max(200, scroller.clientWidth * 0.7), behavior: 'smooth' });
