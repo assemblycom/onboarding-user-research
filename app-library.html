@@ -81,7 +81,19 @@
     .al-pnav-item:first-child { background: rgba(255,255,255,0.08); color: #fff; }
     .al-pnav-item svg { width: 18px; height: 18px; color: rgba(255,255,255,0.6); flex-shrink: 0; }
     .al-pnav-item .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .al-portal-body { flex: 1; background: #b6b6b8; }
+    /* Light mock of the client's Home view (instead of a flat gray block). */
+    .al-portal-body { flex: 1; min-width: 0; background: #f7f7f5; display: flex; flex-direction: column; overflow: hidden; }
+    .pb-top { height: 50px; flex-shrink: 0; background: #fff; border-bottom: 1px solid #ececea; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; }
+    .pb-title { font-size: 13px; font-weight: 500; color: #212b36; }
+    .pb-ava { width: 26px; height: 26px; border-radius: 50%; background: #e4e4df; }
+    .pb-content { padding: 18px; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+    .pb-hero { background: #fff; border: 1px solid #ececea; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 9px; }
+    .pb-bar { height: 9px; border-radius: 999px; background: #e7e7e2; }
+    .pb-bar.w35 { width: 35%; } .pb-bar.w55 { width: 55%; } .pb-bar.w70 { width: 70%; }
+    .pb-pill { margin-top: 4px; width: 96px; height: 26px; border-radius: 999px; background: #d9ed92; }
+    .pb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .pb-card { background: #fff; border: 1px solid #ececea; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 9px; }
+    .pb-ic { width: 30px; height: 30px; border-radius: 8px; background: #eef0f3; }
 
     @media (max-width: 980px) {
       .al-body { flex-direction: column; }
@@ -159,7 +171,21 @@
               <div class="al-portal-brand"><span class="al-pavatar" id="pAvatar">S</span><span class="label" id="pName">Studio</span></div>
               <nav class="al-portal-nav" id="portalNav"></nav>
             </div>
-            <div class="al-portal-body"></div>
+            <div class="al-portal-body">
+              <div class="pb-top"><span class="pb-title">Home</span><span class="pb-ava"></span></div>
+              <div class="pb-content">
+                <div class="pb-hero">
+                  <div class="pb-bar w35"></div>
+                  <div class="pb-bar w70"></div>
+                  <div class="pb-pill"></div>
+                </div>
+                <div class="pb-grid">
+                  <div class="pb-card"><div class="pb-ic"></div><div class="pb-bar w55"></div><div class="pb-bar w35"></div></div>
+                  <div class="pb-card"><div class="pb-ic"></div><div class="pb-bar w55"></div><div class="pb-bar w35"></div></div>
+                </div>
+                <div class="pb-card"><div class="pb-bar w35"></div><div class="pb-bar w70"></div><div class="pb-bar w55"></div></div>
+              </div>
+            </div>
           </div>
         </section>
       </div>
