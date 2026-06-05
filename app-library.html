@@ -52,7 +52,8 @@
 
     .al-body { flex: 1; display: flex; min-height: 0; }
     .al-apps { flex: 1; min-width: 0; overflow-y: auto; padding: 26px 32px; border-right: 1px solid var(--border); }
-    .al-preview { width: 46%; max-width: 600px; flex-shrink: 0; overflow-y: auto; padding: 26px 32px; }
+    /* Bleeds off the right + bottom edges (anchored to the corner). */
+    .al-preview { width: 46%; max-width: 600px; flex-shrink: 0; display: flex; flex-direction: column; min-height: 0; padding: 26px 0 0 32px; }
     .al-h { font-size: 20px; font-weight: 500; letter-spacing: -0.01em; margin: 0 0 18px; }
 
     /* App list */
@@ -70,7 +71,7 @@
     .al-menu svg { width: 18px; height: 18px; }
 
     /* Client preview device */
-    .al-device { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; height: 540px; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+    .al-device { flex: 1; min-height: 0; border: 1px solid var(--border); border-right: none; border-bottom: none; border-radius: 14px 0 0 0; overflow: hidden; display: flex; background: #fff; }
     .al-portal-side { width: 196px; flex-shrink: 0; background: #26262a; display: flex; flex-direction: column; padding: 14px 12px; gap: 2px; }
     .al-portal-brand { display: flex; align-items: center; gap: 9px; padding: 5px 6px 16px; color: #fff; font-size: 14px; font-weight: 500; }
     .al-portal-brand .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -85,7 +86,8 @@
     @media (max-width: 980px) {
       .al-body { flex-direction: column; }
       .al-apps { border-right: none; border-bottom: 1px solid var(--border); }
-      .al-preview { width: 100%; max-width: none; }
+      .al-preview { width: 100%; max-width: none; padding: 26px 32px; }
+      .al-device { flex: none; height: 420px; border: 1px solid var(--border); border-radius: 14px; }
     }
   </style>
 </head>
