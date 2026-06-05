@@ -302,6 +302,20 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Shared with the injected sidebar script (builder-sidebar.js).
   try { window.__asmAppName = APP_NAME; } catch (e) {}
 
+  // Persist the in-progress app as a draft the instant the builder loads — so it
+  // survives navigating away mid-build/plan even before the sidebar script's
+  // 60ms loop has run. Dedupes by name; never downgrades an existing entry.
+  try {
+    var _bk = 'onb.buildApps';
+    var _bl = JSON.parse(localStorage.getItem(_bk));
+    if (!Array.isArray(_bl)) _bl = [];
+    var _has = _bl.some(function (a) { return a && a.name && a.name.toLowerCase() === APP_NAME.toLowerCase(); });
+    if (APP_NAME && !_has) {
+      _bl.push({ name: APP_NAME, status: 'draft', hash: location.hash || '' });
+      localStorage.setItem(_bk, JSON.stringify(_bl));
+    }
+  } catch (e) {}
+
   // Bundle is a React app — synthetic .click() doesn't fire its
   // delegated handlers. Reach into the fiber's props and call onClick
   // directly with a minimal synthetic event. Hoisted to IIFE scope so
