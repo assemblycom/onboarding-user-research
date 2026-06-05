@@ -787,7 +787,10 @@
     const msg = document.getElementById('portalMsg');
     const box = document.getElementById('portalUrlBox');
     if (!coInput || !sub) return;
-    const TAKEN = ['acme', 'demo', 'test', 'studio', 'admin', 'app', 'client', 'portal', 'rocket'];
+    // Reserved demo word(s): always shown as unavailable AND never auto-resolved,
+    // so the "URL is taken" flow can be demonstrated on demand (type "studiotest").
+    const RESERVED_DEMO = ['studiotest'];
+    const TAKEN = ['acme', 'demo', 'test', 'studio', 'admin', 'app', 'client', 'portal', 'rocket', 'studiotest'];
     const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     const CROSS = '<img src="assets/circle-xmark.svg" width="20" height="20" alt="" />';
     const MAX_SUB = 22;
@@ -809,23 +812,26 @@
       if (shortened && msg) { msg.textContent = 'Portal URL is kept to ' + MAX_SUB + ' characters.'; msg.classList.add('show', 'warn'); }
     }
 
-    // Continue is enabled by default — the fields come pre-filled, and we
-    // always resolve the portal URL to an available one, so there's nothing
-    // to block on.
+    // Continue is enabled by default (fields pre-fill, URLs auto-resolve), but
+    // blocks while the URL is explicitly taken so the "not available" flow works.
     const userName = document.getElementById('userName');
     const cont2 = document.getElementById('studioContinue2');
     function syncContinue2() {
       if (!cont2) return;
-      cont2.disabled = false;
-      cont2.style.opacity = '1';
-      cont2.style.cursor = 'pointer';
+      const taken = !!(box && box.classList.contains('invalid'));
+      cont2.disabled = taken;
+      cont2.style.opacity = taken ? '0.45' : '1';
+      cont2.style.cursor = taken ? 'default' : 'pointer';
     }
 
     // If a base subdomain is taken, append a word (then a number) until we
     // find a free one — the user never lands on an unavailable URL.
     function findAvailable(base) {
       base = slug(base);
-      if (!base || TAKEN.indexOf(base) === -1) return base;
+      if (!base) return base;
+      // The demo word is left unavailable on purpose (don't auto-append a suffix).
+      if (RESERVED_DEMO.indexOf(base) !== -1) return base;
+      if (TAKEN.indexOf(base) === -1) return base;
       const words = ['hq', 'app', 'team', 'co', 'io', 'labs'];
       for (let i = 0; i < words.length; i++) {
         const c = (base + words[i]).slice(0, MAX_SUB);
