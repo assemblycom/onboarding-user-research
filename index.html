@@ -248,7 +248,6 @@
 </div>
 <div class="studio-auth" id="authOverlay">
   <div class="studio-auth-card">
-    <button class="studio-auth-close" id="authClose" aria-label="Close">✕</button>
 
     <!-- Step 1: Welcome to Studio -->
     <div class="studio-step" id="authStep1">
@@ -627,7 +626,6 @@
     authOverlay.classList.remove('visible');
   }
 
-  document.getElementById('authClose').addEventListener('click', closeAuthModal);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && authOverlay.classList.contains('visible')) closeAuthModal(); });
 
   // Track which method the user signed in with, so the portal can show the right identity.
