@@ -1,6 +1,6 @@
 /* Shared "Getting started" FTUX checklist logic across the portal pages.
    - Progress bar + per-item state (todo / in-progress / done) persisted in localStorage.
-   - Publish → build page · Explore → client portal (completes on visit) · Invite → modal (completes on close).
+   - Publish → build page · Explore → client portal (completes on visit) · Invite → modal (completes ONLY when the user clicks "Invite"; dismissing / "Maybe later" leaves it as todo).
    Exposed as window.ftuxInit() and idempotent, so callers that rebuild the
    sidebar (e.g. the AI builder, which swaps its whole document on load) can
    safely re-run it after re-injecting the checklist markup. */
