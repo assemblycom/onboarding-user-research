@@ -258,22 +258,32 @@
       </div>
     </div>
 
-    <!-- Step 1b: Verification code (passwordless, industry-standard) -->
+    <!-- Step 1b: Magic link (passwordless). Verification code is a fallback link. -->
     <div class="studio-step" id="authStepEmail" hidden>
       <input type="email" id="userEmail" hidden />
       <div class="studio-mark"><img src="assets/studio-mark.svg" alt="Studio" /></div>
       <h1 class="studio-h1">Check your email</h1>
-      <p class="studio-sub">Enter the 6-digit code we sent to <strong id="magicEmail" style="font-weight:500;color:#212b36">your email</strong>.</p>
-      <div class="studio-code" id="codeInputs">
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
-        <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+      <p class="studio-sub">To continue, click the link sent to<br /><strong id="magicEmail" style="font-weight:500;color:#212b36">your email</strong></p>
+      <button class="studio-primary" id="emailContinue" type="button" style="margin-top:28px">Open the magic link</button>
+
+      <!-- Revealed by "Enter verification code" -->
+      <div id="codeFallback" hidden style="margin-top:26px">
+        <div class="studio-code" id="codeInputs">
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+        </div>
+        <button class="studio-primary" id="codeVerify" type="button" style="margin-top:20px">Verify &amp; continue</button>
       </div>
-      <button class="studio-primary" id="emailContinue" type="button" style="margin-top:28px">Continue</button>
-      <button id="magicResend" type="button" style="display:block;margin:14px auto 0;background:none;border:0;color:#6b6f76;font-family:inherit;font-size:13px;font-weight:400;cursor:pointer">Didn’t get it? Resend code</button>
+
+      <div class="studio-altlinks">
+        <button class="studio-altlink" id="linkEnterCode" type="button">Enter verification code</button>
+        <button class="studio-altlink" id="linkResend" type="button">Resend email</button>
+        <button class="studio-altlink" id="linkDiffEmail" type="button">Use a different email</button>
+      </div>
     </div>
 
     <!-- Step 2: Workspace details -->
@@ -604,40 +614,80 @@
   // Track which method the user signed in with, so the portal can show the right identity.
   let authVia = 'email';
 
-  // Step 1: "Continue with email" → passwordless code-entry step; Google → fake Google sign-in
+  // Step 1: "Continue with email" → passwordless magic-link step; Google → fake Google sign-in
   const welcomeEmail = document.getElementById('welcomeEmail');
   const studioContinue1 = document.getElementById('studioContinue1');
+  const emailContinue = document.getElementById('emailContinue');
+  const codeFallback = document.getElementById('codeFallback');
+  const linkEnterCode = document.getElementById('linkEnterCode');
+  const linkResend = document.getElementById('linkResend');
+  const linkDiffEmail = document.getElementById('linkDiffEmail');
+  const codeVerify = document.getElementById('codeVerify');
+
+  // Both the magic-link button and the code fallback land in the same place:
+  // the workspace step, pre-filled from the email's domain.
+  function proceedFromEmail() {
+    const email = (document.getElementById('userEmail')?.value || (welcomeEmail && welcomeEmail.value) || '').trim();
+    if (window.__asmPrefillWorkspace) window.__asmPrefillWorkspace(email);
+    showAuthStep(2);
+  }
+
+  // Back to the clean "click the link" state (used each time we enter the step).
+  function resetEmailStep() {
+    if (codeFallback) codeFallback.hidden = true;
+    if (emailContinue) emailContinue.hidden = false;
+    if (linkEnterCode) linkEnterCode.hidden = false;
+    if (linkResend) { linkResend.textContent = 'Resend email'; linkResend.style.color = ''; }
+    if (window.__asmResetCode) window.__asmResetCode(true);
+  }
+
   if (studioContinue1) studioContinue1.addEventListener('click', () => {
     authVia = 'email';
     const email = (welcomeEmail && welcomeEmail.value.trim()) || '';
     const ue = document.getElementById('userEmail'); if (ue) ue.value = email;
     const me = document.getElementById('magicEmail'); if (me) me.textContent = email || 'your email';
+    resetEmailStep();
     showAuthStep('email');
+  });
+
+  if (emailContinue) emailContinue.addEventListener('click', proceedFromEmail);
+  if (codeVerify) codeVerify.addEventListener('click', proceedFromEmail);
+
+  // "Enter verification code" reveals the code fallback in place of the link button.
+  if (linkEnterCode) linkEnterCode.addEventListener('click', () => {
+    if (emailContinue) emailContinue.hidden = true;
+    linkEnterCode.hidden = true;
+    if (codeFallback) codeFallback.hidden = false;
     if (window.__asmResetCode) window.__asmResetCode();
   });
-  // Code entered → workspace details, pre-filled from the email's domain.
-  document.getElementById('emailContinue').addEventListener('click', () => {
-    const email = (document.getElementById('userEmail')?.value || (welcomeEmail && welcomeEmail.value) || '').trim();
-    if (window.__asmPrefillWorkspace) window.__asmPrefillWorkspace(email);
-    showAuthStep(2);
+
+  // Lightweight feedback (prototype sends no real email).
+  if (linkResend) linkResend.addEventListener('click', () => {
+    linkResend.textContent = 'Email sent ✓';
+    linkResend.style.color = '#2e7d32';
   });
-  // "Resend" gives lightweight confirmation feedback (prototype: no real email).
-  const magicResend = document.getElementById('magicResend');
-  if (magicResend) magicResend.addEventListener('click', () => {
-    magicResend.textContent = 'Code sent ✓';
-    magicResend.style.color = '#2e7d32';
+
+  // "Use a different email" → back to the welcome step.
+  if (linkDiffEmail) linkDiffEmail.addEventListener('click', () => {
+    showAuthStep(1);
+    if (welcomeEmail) welcomeEmail.focus();
   });
 
   // Verification-code boxes: numeric-only, auto-advance, backspace to previous,
-  // Enter submits. __asmResetCode clears them and focuses the first on entry.
+  // Enter submits, paste fans out. __asmResetCode(noFocus) clears them.
   (function () {
     const wrap = document.getElementById('codeInputs');
     if (!wrap) return;
     const css = document.createElement('style');
     css.textContent =
-      '.studio-code{display:flex;justify-content:center;gap:10px;margin-top:30px;}' +
+      '.studio-code{display:flex;justify-content:center;gap:10px;}' +
       '.studio-code input{width:46px;height:56px;text-align:center;font-size:22px;font-weight:400;color:#212b36;font-family:inherit;border:1px solid #d3d6db;border-radius:10px;background:#fff;outline:none;transition:border-color .12s,box-shadow .12s;-moz-appearance:textfield;}' +
-      '.studio-code input:focus{border-color:#9aa0a6;box-shadow:0 0 0 3px rgba(0,0,0,0.05);}';
+      '.studio-code input:focus{border-color:#9aa0a6;box-shadow:0 0 0 3px rgba(0,0,0,0.05);}' +
+      // The primary button sets its own display, so [hidden] needs to win.
+      '.studio-primary[hidden]{display:none;}' +
+      '.studio-altlinks{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:26px;}' +
+      '.studio-altlink{background:none;border:0;padding:0;font-family:inherit;font-size:14px;font-weight:400;color:#6b6f76;text-decoration:underline;text-underline-offset:3px;cursor:pointer;transition:color .12s;}' +
+      '.studio-altlink:hover{color:#212b36;}';
     document.head.appendChild(css);
     const boxes = [].slice.call(wrap.querySelectorAll('input'));
     boxes.forEach((b, i) => {
@@ -647,9 +697,8 @@
       });
       b.addEventListener('keydown', e => {
         if (e.key === 'Backspace' && !b.value && boxes[i - 1]) boxes[i - 1].focus();
-        if (e.key === 'Enter') document.getElementById('emailContinue').click();
+        if (e.key === 'Enter' && codeVerify) codeVerify.click();
       });
-      // Pasting a full code fans out across the boxes.
       b.addEventListener('paste', e => {
         const digits = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, boxes.length);
         if (!digits) return;
@@ -658,7 +707,7 @@
         (boxes[digits.length] || boxes[boxes.length - 1]).focus();
       });
     });
-    window.__asmResetCode = () => { boxes.forEach(b => { b.value = ''; }); setTimeout(() => boxes[0] && boxes[0].focus(), 60); };
+    window.__asmResetCode = noFocus => { boxes.forEach(b => { b.value = ''; }); if (!noFocus) setTimeout(() => boxes[0] && boxes[0].focus(), 60); };
   })();
 
   // ── Fake "Sign in with Google" experience (prototype) ──
