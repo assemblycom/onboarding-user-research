@@ -2886,8 +2886,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (b.hasAttribute('data-asm-tab-bound')) continue;
       var name = (b.textContent || '').trim();
       if (name === 'Notifications') {
+        // Non-interactive third tab — don't switch into the notif view.
         b.setAttribute('data-asm-tab-bound', '');
-        b.addEventListener('mousedown', function() { document.body.classList.add('asm-notif-tab'); });
       } else if (name === 'Dashboard' || name === 'Portal') {
         b.setAttribute('data-asm-tab-bound', '');
         b.addEventListener('mousedown', function() { document.body.classList.remove('asm-notif-tab'); });
@@ -2901,16 +2901,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   //    from here, so they're dimmed and non-interactive.
   // Re-applied every tick so it survives the bundle's React re-renders.
   function styleBundleTabs() {
-    // Remove the Notifications tab (right of Portal) from the bundle topbar.
-    // Dashboard/Portal disabled-during-load is handled by ensureLoadingTabs;
-    // the bundle's real tabs show (enabled) once the topbar goes transparent
-    // in the done phase.
+    // Notifications stays as a visible third tab, but is non-interactive in the
+    // prototype — builder-sidebar.js's disableNotifTab() blocks its click and
+    // shows a "Not part of this prototype" tooltip on hover. (We no longer hide
+    // it; just make sure any earlier display:none is cleared.)
     var btns = document.querySelectorAll('button');
     for (var i = 0; i < btns.length; i++) {
       var b = btns[i];
-      if ((b.textContent || '').trim() === 'Notifications') {
-        if (b.style.display !== 'none') b.style.display = 'none';
-      }
+      if ((b.textContent || '').trim() === 'Notifications' && b.style.display === 'none') b.style.display = '';
     }
   }
   function syncNotifPanel() {
