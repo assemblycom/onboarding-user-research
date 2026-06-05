@@ -523,6 +523,10 @@
   // portal (dark sidebar + app), so the client sidebar is always present.
   function injectSriApp() {
     var ov = document.getElementById('asm-sri-overlay');
+    // Only show the finished app once the build is done — during qa/plan/
+    // building the bundle's own progress visuals must be visible.
+    var phase = (window.__ASM_STATE || {}).phase;
+    if (phase !== 'done') { if (ov) ov.style.display = 'none'; return; }
     var tab = activePreviewTab();
     var card = null, mode = null;
     if (tab === 'Portal') { card = findPortalCard(); mode = 'portal'; }
