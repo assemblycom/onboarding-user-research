@@ -72,9 +72,10 @@
     '#asm-load-cover .asm-cover-skel span:nth-child(2){width:78%;}#asm-load-cover .asm-cover-skel span:nth-child(3){width:54%;}' +
     '@keyframes asmLoadShimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}' +
     // Notifications preview tab is disabled in the prototype — tooltip on hover.
-    '.asm-notif-disabled{position:relative;cursor:default !important;}' +
-    '.asm-notif-disabled::after{content:"Not part of this prototype";position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(-2px);background:#1a1a1a;color:#fff;font-size:12px;font-weight:500;line-height:1;padding:7px 10px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s,transform .12s;box-shadow:0 4px 14px rgba(0,0,0,0.18);z-index:300;}' +
-    '.asm-notif-disabled:hover::after{opacity:1;transform:translateX(-50%) translateY(0);}' +
+    '.asm-notif-disabled{cursor:default !important;}' +
+    // Body-appended fixed tooltip — a ::after would be clipped by the topbar's
+    // overflow:hidden, so we position this outside the clipping container.
+    '#asm-notif-tip{position:fixed;z-index:99999;display:none;background:#1a1a1a;color:#fff;font-size:12px;font-weight:500;line-height:1;padding:7px 10px;border-radius:7px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,0.18);pointer-events:none;}' +
     // Workspace switcher isn't built for the prototype — tooltip on hover.
     '.asm-sb .ws[data-asm-tip]{position:relative;cursor:default;}' +
     '.asm-sb .ws[data-asm-tip]::after{content:attr(data-asm-tip);position:absolute;top:calc(100% + 6px);left:8px;background:#1a1a1a;color:#fff;font-size:12px;font-weight:500;line-height:1;padding:7px 10px;border-radius:7px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;box-shadow:0 4px 14px rgba(0,0,0,0.18);z-index:300;}' +
@@ -438,8 +439,22 @@
         b.setAttribute('data-asm-noclick', '1');
         // Capture phase + stopImmediatePropagation beats the bundle's onClick.
         b.addEventListener('click', function (e) { e.preventDefault(); e.stopImmediatePropagation(); }, true);
+        // Body-appended tooltip (escapes the topbar's overflow:hidden).
+        b.addEventListener('mouseenter', function () {
+          var tip = notifTip();
+          var r = this.getBoundingClientRect();
+          tip.style.display = 'block';
+          tip.style.left = Math.round(r.left) + 'px';
+          tip.style.top = Math.round(r.bottom + 8) + 'px';
+        });
+        b.addEventListener('mouseleave', function () { var t = document.getElementById('asm-notif-tip'); if (t) t.style.display = 'none'; });
       }
     }
+  }
+  function notifTip() {
+    var t = document.getElementById('asm-notif-tip');
+    if (!t) { t = document.createElement('div'); t.id = 'asm-notif-tip'; t.textContent = 'Not part of this prototype'; document.body.appendChild(t); }
+    return t;
   }
 
   // Hand-built Service Request Intake app preview (Assembly UI). Replaces the
