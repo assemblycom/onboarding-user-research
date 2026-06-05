@@ -3267,6 +3267,18 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (onDone) setTimeout(onDone, 0);
       return scroll.querySelector('[data-id="' + id + '"]');
     }
+    // On resume (returning to a build already in progress) the assistant has
+    // already "thought" — drop the typewriter and render the text at once.
+    if (window.__asmResumePlan || window.__asmResumeBuild || window.__asmResumePublished) {
+      var instant = document.createElement('div');
+      instant.className = 'asm-msg-agent';
+      if (id) { instant.setAttribute('data-id', id); renderedFlags[id] = true; }
+      instant.textContent = text;
+      scroll.appendChild(instant);
+      scrollToBottom(scroll);
+      if (onDone) setTimeout(onDone, 0);
+      return instant;
+    }
     var div = document.createElement('div');
     div.className = 'asm-msg-agent';
     if (id) { div.setAttribute('data-id', id); renderedFlags[id] = true; }
