@@ -1141,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.asm-plan-todos--tl .asm-plan-todos-label { color:#212B36; }',
       '.asm-plan-todos--tl .asm-plan-todos-check { display:none; }',
       '.asm-plan-todos--tl .asm-plan-todos-body { border-top:0; }',
-      '.asm-plan-todos--tl .asm-plan-todos-row { margin:0 -8px 0 6px; padding:8px 8px 8px 16px; border-left:2px solid rgba(16,16,16,0.14); border-radius:0; }',
+      '.asm-plan-todos--tl .asm-plan-todos-row { margin:0 6px; padding:8px 10px 8px 16px; border-left:2px solid rgba(16,16,16,0.14); border-radius:0; }',
       '.asm-plan-todos--tl .asm-plan-todos-row + .asm-plan-todos-row { border-top:0; }',
       '.asm-plan-todos--tl .asm-plan-todos-row[data-status="queued"] { border-left-color:rgba(16,16,16,0.14); }',
       '.asm-plan-todos--tl .asm-plan-todos-row[data-status="inprogress"] { border-left-color:rgba(17,91,59,0.55); background:rgba(17,91,59,0.06); }',
@@ -1175,6 +1175,11 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.asm-plan-todos--tl .asm-plan-todos-header::after { content:""; position:absolute; left:0; right:0; top:100%; height:12px; background:linear-gradient(#FFFFFF, rgba(255,255,255,0)); pointer-events:none; }',
       '.asm-plan-todos--tl.collapsed .asm-plan-todos-header { border-bottom: 0; border-radius: 10px; }',
       '.asm-plan-todos--tl .asm-plan-todos-icon { background: conic-gradient(#115B3B 0%, rgba(16,16,16,0.14) 0); }',
+      // While building, the header node reads as a clean spinner (a green arc on a
+      // faint track) rather than a near-empty progress fill that looks broken.
+      '@keyframes asmTodoSpin { to { transform: rotate(360deg); } }',
+      'body.asm-phase-building .asm-plan-todos--tl .asm-plan-todos-icon { background: conic-gradient(#115B3B 0deg 90deg, rgba(16,16,16,0.13) 90deg 360deg) !important; animation: asmTodoSpin 0.9s linear infinite; }',
+      '@media (prefers-reduced-motion: reduce) { body.asm-phase-building .asm-plan-todos--tl .asm-plan-todos-icon { animation: none; } }',
       // ── Progressive step reveal: steps slide in one-by-one, each with a
       // brief shimmer "loading" state, mirroring how the plan is generated.
       '.asm-plan-todos--tl .asm-plan-todos-row { max-height: 200px; transition: max-height 0.32s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease; }',
