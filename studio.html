@@ -73,6 +73,13 @@
     @keyframes asmPromptGlow { to { --asm-prompt-angle: 510deg; } }
     @media (prefers-reduced-motion: reduce) { .promptbox { animation: none; } }
     .promptbox:focus-within { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    /* One-app limit tooltip (shown when an app already exists) */
+    .promptbox-wrap { position: relative; }
+    .one-app-tip { position: absolute; left: 0; top: calc(100% + 10px); max-width: 360px; background: #1a1a1a; color: #fff; font-size: 13px; line-height: 1.5; padding: 10px 13px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.22); opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; z-index: 20; }
+    .one-app-tip.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .one-app-tip::before { content: ''; position: absolute; bottom: 100%; left: 22px; border: 6px solid transparent; border-bottom-color: #1a1a1a; }
+    .one-app-tip a { color: #d9ed92; cursor: pointer; white-space: nowrap; font-weight: 500; }
+    .one-app-tip a:hover { text-decoration: underline; }
     .promptbox textarea { width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 15px; line-height: 1.55; color: var(--text); padding: 16px 18px 6px; min-height: 70px; max-height: 240px; background: transparent; }
     .promptbox textarea::placeholder { color: #9aa0a6; }
     .promptbox-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 12px; }
@@ -185,12 +192,15 @@
       <div class="scroll-area">
         <div class="content">
           <h1 class="greeting">What will you build?</h1>
-          <div class="promptbox">
-            <textarea id="buildPrompt" rows="2" placeholder="Describe the app you want to build for your clients…"></textarea>
-            <div class="promptbox-bar">
-              <button class="attach" title="Attach"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
-              <button class="start-btn" id="startBuilding" type="button" aria-label="Start building"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+          <div class="promptbox-wrap">
+            <div class="promptbox">
+              <textarea id="buildPrompt" rows="2" placeholder="Describe the app you want to build for your clients…"></textarea>
+              <div class="promptbox-bar">
+                <button class="attach" title="Attach"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
+                <button class="start-btn" id="startBuilding" type="button" aria-label="Start building"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+              </div>
             </div>
+            <div class="one-app-tip" id="oneAppTip">For this prototype, you can build just one app. <a class="one-app-edit">Open your app →</a></div>
           </div>
 
           <div id="appCategories" style="margin-top:22px"></div>
@@ -336,9 +346,29 @@
     })();
 
     // Start Building → kick off the existing build process (plan mode etc.)
+    // This prototype is limited to one app. If one already exists, gently explain
+    // it (tooltip) and route the user back to their app instead of building another.
+    var existingApp = null;
+    try { var _al = JSON.parse(localStorage.getItem('onb.buildApps')); if (Array.isArray(_al) && _al.length) existingApp = _al[_al.length - 1]; } catch (e) {}
+    var oneAppTip = document.getElementById('oneAppTip');
+    var oneTipTimer = null;
+    function showOneAppTip() {
+      if (!existingApp || !oneAppTip) return;
+      oneAppTip.classList.add('show');
+      if (oneTipTimer) clearTimeout(oneTipTimer);
+      oneTipTimer = setTimeout(function () { oneAppTip.classList.remove('show'); }, 5000);
+    }
+    if (existingApp && oneAppTip) {
+      var editLink = oneAppTip.querySelector('.one-app-edit');
+      if (editLink) editLink.addEventListener('click', function () { location.href = 'builder.html' + (existingApp.hash || navSuffix); });
+      promptField.addEventListener('focus', showOneAppTip);
+      promptField.addEventListener('click', showOneAppTip);
+    }
+
     function startBuilding() {
       const p = promptField.value.trim();
       if (!p) { promptField.focus(); return; }
+      if (existingApp) { showOneAppTip(); return; }   // one-app limit
       // Build kicked off — clear the saved draft so a later visit starts clean.
       try { localStorage.removeItem(STUDIO_PROMPT_KEY); } catch (e) {}
       window.location.href = 'builder.html#prompt=' + encodeURIComponent(p);
