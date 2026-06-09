@@ -426,7 +426,7 @@
       const VARIANTS = {
         '1': { cap: 'Option 1. Test client is a checklist step; landing shows a 2-step coachmark (intro → magic link in the ••• menu).' },
         '2': { cap: 'Option 2. No checklist step for the test client; landing shows one card explaining we set it up to help you test.' },
-        '3': { cap: 'Option 3. Option 1’s CRM coachmark (no “Meet your test client” checklist step) PLUS the new portal-entry interstitial (Continue to Portal / Manage Clients) at the Explore step.' }
+        '3': { cap: 'Option 3. No teaching — onboarding just has “Explore the client experience”, which opens the Open Portal experience directly (branded sign-in → portal, with the Previewing-as switcher).' }
       };
 
       let variant = '1';   // Locked to Option 1 (chosen onboarding): "Meet your test client" + coachmark.
@@ -819,23 +819,14 @@
       }, true);
 
       // ── Boot ──
-      // Every option pre-provisions a test client (no empty state); the framing differs.
+      // The test client is pre-provisioned (no empty state) and introduced via the
+      // coachmark — not a checklist step. Hide that row (kept in the DOM so ftux's
+      // index mapping stays intact); only "Explore the client experience" remains.
       var clientItem = null;
       document.querySelectorAll('.checklist-item').forEach(function (it) {
         if (it.textContent.indexOf('Create test client') > -1) clientItem = it;
       });
-      if (variant === '1') {
-        // Option 1: keep it as a visible step, reframed from "create" to "meet".
-        if (clientItem) [].forEach.call(clientItem.childNodes, function (n) {
-          if (n.nodeType === 3 && n.textContent.indexOf('Create test client') > -1) n.textContent = 'Meet your test client';
-        });
-        // The step completes when coachmark card 1 is seen (showCoach → markClientDone).
-      } else {
-        // Options 2 & 3: the test client isn't a checklist task — hide the step (kept in
-        // DOM so ftux's index mapping stays intact) and mark it done for the progress bar.
-        if (clientItem) clientItem.style.display = 'none';
-        try { var sd = JSON.parse(localStorage.getItem('onb.ftux')) || {}; sd.client = 'done'; localStorage.setItem('onb.ftux', JSON.stringify(sd)); } catch (e) {}
-      }
+      if (clientItem) clientItem.style.display = 'none';
 
       // No empty state — the test client is already there.
       const existing = readClient();
@@ -847,16 +838,17 @@
       if (getHashParam('addclient')) {
         setTimeout(openInviteForm, 200);
       } else {
-        // Card on load: Option 2 → single info card; Options 1 & 3 → the 2-step coachmark.
-        // (Option 3 also gets the new portal-entry interstitial via the Explore step.)
+        // Card on load: Option 1 → 2-step coachmark, Option 2 → single info card.
+        // Option 3 shows nothing on the CRM — its moment is purely the Open Portal
+        // experience (branded sign-in → portal), reached via "Explore the client experience".
         setTimeout(function () {
-          if (variant === '2') showInfoCard(current);
-          else showCoach(current);
+          if (variant === '1') showCoach(current);
+          else if (variant === '2') showInfoCard(current);
         }, 280);
       }
     })();
   </script>
-  <script src="ftux.js?v=18"></script>
+  <script src="ftux.js?v=19"></script>
   <script src="apps-nav.js?v=2"></script>
   <script src="prototype-hints.js?v=5"></script>
 </body>

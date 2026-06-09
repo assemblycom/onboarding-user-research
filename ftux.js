@@ -239,6 +239,10 @@
   }
   // Show the interstitial first; if already seen, go straight to the portal.
   function openPortalIntro() {
+    // Option 3 teaches nothing — go straight into the Open Portal experience
+    // (branded sign-in → portal), no explanatory interstitial.
+    var v3; try { v3 = localStorage.getItem('onb.crmVariant') === '3'; } catch (e) {}
+    if (v3) { location.href = 'portal.html#signin=1' + (navSuffix() ? '&' + navSuffix().slice(1) : ''); return; }
     var seen; try { seen = localStorage.getItem('onb.portalIntroSeen'); } catch (e) {}
     if (seen) { location.href = 'portal.html' + navSuffix(); return; }
     var ov = ensurePortalIntro();
@@ -263,21 +267,13 @@
 
     ensureModal();
 
-    // ── Variant-aware "test client" step (option chosen on the CRM, in localStorage) ──
-    // Keeps the checklist consistent on every page: Option 2 hides the step entirely;
-    // Options 1 & 3 relabel "Create test client" → "Meet your test client".
+    // The test client is no longer its own checklist step — it's surfaced via the
+    // CRM coachmark. Hide that row on every page (kept in the DOM so the keys[]
+    // index mapping stays aligned), leaving only "Explore the client experience".
     (function () {
-      var v = '1';   // Locked to Option 1 (chosen onboarding).
       [].forEach.call(cl.querySelectorAll('.checklist-item'), function (it) {
         var txt = it.textContent;
-        if (txt.indexOf('Create test client') === -1 && txt.indexOf('Meet your test client') === -1) return;
-        // Options 2 & 3 set the test client up silently (no checklist step);
-        // Option 1 keeps it as a step, relabeled "Meet your test client".
-        if (v === '2' || v === '3') { it.style.display = 'none'; return; }
-        it.style.display = '';
-        var lbl = it.querySelector('.ci-label');
-        if (lbl) { if (lbl.textContent.indexOf('Create test client') > -1) lbl.textContent = 'Meet your test client'; }
-        else [].forEach.call(it.childNodes, function (n) { if (n.nodeType === 3 && n.textContent.indexOf('Create test client') > -1) n.textContent = 'Meet your test client'; });
+        if (txt.indexOf('Create test client') > -1 || txt.indexOf('Meet your test client') > -1) it.style.display = 'none';
       });
     })();
 
