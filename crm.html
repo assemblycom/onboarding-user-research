@@ -550,6 +550,7 @@
         titleEl.style.marginBottom = '';
         stepEl.style.display = '';
         open.style.display = '';
+        document.getElementById('crmCoachLater').style.display = 'none';   // no Back/Later — dismiss via X only
         stepEl.textContent = step + ' of 2';
         const row = tbody.querySelector('tr');
         if (step === 1) {
