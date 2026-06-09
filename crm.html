@@ -844,13 +844,12 @@
       if (getHashParam('addclient')) {
         setTimeout(openInviteForm, 200);
       } else {
-        // Card on load: Option 1 → 2-step coachmark, Option 2 → single info card.
-        // Option 3 shows nothing on the CRM — its moment is purely the Open Portal
-        // experience (branded sign-in → portal), reached via "Explore the client experience".
-        setTimeout(function () {
-          if (variant === '1') showCoach(current);
-          else if (variant === '2') showInfoCard(current);
-        }, 280);
+        // The coachmark auto-shows the first time the CRM is opened (introducing the
+        // test client + magic-link preview, and updating the checklist). Once "Explore
+        // the client experience" is completed, it no longer appears on its own.
+        var exploreDone = false;
+        try { exploreDone = (JSON.parse(localStorage.getItem('onb.ftux')) || {}).explore === 'done'; } catch (e) {}
+        if (!exploreDone) setTimeout(function () { showCoach(current); }, 280);
       }
     })();
   </script>
