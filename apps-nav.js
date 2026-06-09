@@ -15,6 +15,8 @@
     try { var one = JSON.parse(localStorage.getItem('onb.buildApp')); if (one && one.name) list = [one]; } catch (e) {}
   }
   if (!list.length) return;
+  // Single-app prototype — only ever surface the most recent app.
+  if (list.length > 1) list = list.slice(-1);
 
   var nav = document.querySelector('.sidebar .nav') || document.querySelector('.nav');
   if (!nav) return;

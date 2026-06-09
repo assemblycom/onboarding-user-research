@@ -227,13 +227,9 @@
       // (e.g. a ready plan) instead of replaying the Q&A + reasoning typing.
       var _ph = (window.__ASM_STATE || {}).phase;
       if (_ph) rec.phase = _ph;
-      var list = readApps();
-      var found = false;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i] && list[i].name && list[i].name.toLowerCase() === name.toLowerCase()) { list[i] = rec; found = true; break; }
-      }
-      if (!found) list.push(rec);
-      var json = JSON.stringify(list);
+      // This prototype tracks a single app — the current one replaces any prior,
+      // so the sidebar never has multiple drafts to switch between.
+      var json = JSON.stringify([rec]);
       if (json !== lastPersist) { localStorage.setItem('onb.buildApps', json); lastPersist = json; }
     } catch (e) {}
   }

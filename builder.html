@@ -44,7 +44,7 @@
   </script>
   <!-- Shared Studio sidebar + Getting-started FTUX, injected into the bundle. -->
   <script src="ftux.js?v=26"></script>
-  <script src="builder-sidebar.js?v=15"></script>
+  <script src="builder-sidebar.js?v=16"></script>
 </head>
 <body>
   <div id="__bundler_thumbnail">
@@ -314,9 +314,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     var _bl = JSON.parse(localStorage.getItem(_bk));
     if (!Array.isArray(_bl)) _bl = [];
     var _has = _bl.some(function (a) { return a && a.name && a.name.toLowerCase() === APP_NAME.toLowerCase(); });
+    // Single-app prototype: a new app replaces any existing one (no multi-app list).
     if (APP_NAME && !_has) {
-      _bl.push({ name: APP_NAME, status: 'draft', hash: location.hash || '' });
-      localStorage.setItem(_bk, JSON.stringify(_bl));
+      localStorage.setItem(_bk, JSON.stringify([{ name: APP_NAME, status: 'draft', hash: location.hash || '' }]));
     }
   } catch (e) {}
 
