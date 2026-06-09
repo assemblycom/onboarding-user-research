@@ -62,5 +62,24 @@
     // Insert just above "Add app" so apps sit together, in build order.
     if (addItem) nav.insertBefore(a, addItem);
     else nav.appendChild(a);
+
+    // The shimmer means "still building in the background". The prototype can't
+    // truly keep building after you leave, so simulate it finishing: shimmer for
+    // a moment, then mark the app done and stop — done apps never shimmer.
+    if (building) {
+      (function (name, anchor) {
+        setTimeout(function () {
+          try {
+            var l = JSON.parse(localStorage.getItem('onb.buildApps')) || [];
+            for (var i = 0; i < l.length; i++) {
+              if (l[i] && l[i].name && l[i].name.toLowerCase() === name.toLowerCase() && l[i].phase === 'building') l[i].phase = 'done';
+            }
+            localStorage.setItem('onb.buildApps', JSON.stringify(l));
+          } catch (e) {}
+          var lbl = anchor.querySelector('.draft-label');
+          if (lbl) lbl.classList.remove('shimmer-text');
+        }, 6000);
+      })(rec.name, a);
+    }
   });
 })();
