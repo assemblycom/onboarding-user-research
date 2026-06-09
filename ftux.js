@@ -277,11 +277,12 @@
   }
 
   function openPortalIntro() {
-    // Guard: until "Explore the client experience" is completed (which only happens
-    // via the CRM — opening the portal as the test client), redirect there first.
+    // Guard: only redirect to the CRM if the user has never engaged the test client
+    // there (Explore not even started). Once they've been through the CRM coachmark
+    // (in-progress) they can open the portal directly — but note this direct route
+    // does NOT complete "Explore"; that only happens via the CRM (from=crm.html).
     var exp; try { exp = (get() || {}).explore; } catch (e) {}
-    if (exp !== 'done') { showClientFirst(); return; }
-    // Already explored → open the portal directly (no interstitial).
+    if (exp !== 'progress' && exp !== 'done') { showClientFirst(); return; }
     location.href = 'portal.html' + navSuffix();
   }
   window.ftuxOpenPortalIntro = openPortalIntro;
