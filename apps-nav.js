@@ -36,10 +36,11 @@
 
   var CLOCK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#212B36" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>';
 
-  // Names already in the nav (static items like Home, plus any apps we've
-  // already inserted) — so we never duplicate.
+  // Only dedupe against apps we've already inserted — NOT the static nav items
+  // (Home, Messages, …), so a built app still shows even if its name happens to
+  // match a built-in label.
   var seen = {};
-  nav.querySelectorAll('.nav-item').forEach(function (el) {
+  nav.querySelectorAll('.nav-item[data-built-app]').forEach(function (el) {
     seen[el.textContent.trim().toLowerCase()] = 1;
   });
 
