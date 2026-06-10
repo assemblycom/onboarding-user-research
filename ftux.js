@@ -65,7 +65,8 @@
       '.inv-person.selected .inv-person-add{opacity:1;}' +
       '.inv-nm{font-size:13.5px;font-weight:500;line-height:1.3;}' +
       '.inv-em{font-size:12.5px;color:#6b6f76;line-height:1.3;}' +
-      '.inv-foot{padding:16px 22px 22px;flex-shrink:0;}' +
+      '.inv-foot{position:relative;padding:16px 22px 22px;flex-shrink:0;}' +
+      '.inv-foot::before{content:"";position:absolute;left:0;right:0;top:-30px;height:30px;background:linear-gradient(to bottom,rgba(255,255,255,0),#fff);pointer-events:none;}' +
       '.inv-btn{width:100%;height:44px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;}' +
       '.inv-btn:hover{background:#000;}' +
       '.inv-btn:disabled{background:#e7e9ec;color:#a8acb3;cursor:default;}' +
