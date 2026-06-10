@@ -5080,23 +5080,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         // the user pauses the build — so they can request a refinement,
         // which stops the build and pushes a new plan version.
         var v4PausedBuild = STATE.phase === 'building' && STATE.buildPaused;
-        var composerActive = STATE.phase === 'plan' || v4PausedBuild;   // 'done' is locked below
         var composerBox = wrap.querySelector('.asm-composer-box');
-        if (STATE.phase === 'done') {
-          // Refining isn't part of this prototype — lock the composer and, on
-          // hover, point the user to Publish (the app is built and ready).
+        if (STATE.phase === 'done' || STATE.phase === 'plan') {
+          // Typing isn't part of this prototype in these phases — lock the composer
+          // (a hover tooltip explains). The Approve callout above still works, so
+          // plan-phase users approve to build; done-phase users publish.
           ta.disabled = true;
           wrap.classList.add('disabled', 'asm-na');
-          ta.placeholder = 'How might you improve your app?';
-          if (composerBox) composerBox.setAttribute('data-asm-na', 'Not part of this prototype — your app is built and ready to publish (top right).');
-        } else if (composerActive) {
+          if (STATE.phase === 'done') {
+            ta.placeholder = 'How might you improve your app?';
+            if (composerBox) composerBox.setAttribute('data-asm-na', 'Not part of this prototype — your app is built and ready to publish (top right).');
+          } else {
+            ta.placeholder = 'Type to revise the plan';
+            if (composerBox) composerBox.setAttribute('data-asm-na', 'Not part of this prototype — approve the plan above to build it.');
+          }
+        } else if (v4PausedBuild) {
+          // Build paused: keep the composer active so Resume/Stop stays usable.
           wrap.classList.remove('asm-na');
           if (composerBox) composerBox.removeAttribute('data-asm-na');
           if (ta.disabled) {
             ta.disabled = false;
             wrap.classList.remove('disabled');
           }
-          ta.placeholder = v4PausedBuild ? 'Paused — type to revise the plan…' : 'Type to revise the plan';
+          ta.placeholder = 'Paused — type to revise the plan…';
         } else {
           wrap.classList.remove('asm-na');
           if (composerBox) composerBox.removeAttribute('data-asm-na');
