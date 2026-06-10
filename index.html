@@ -789,20 +789,9 @@
                      : hint.getAttribute('data-proto-hint');
       const span = tip.querySelector('span'); if (span) span.textContent = msg;
       tip.style.display = 'inline-flex';
-      let left, top;
-      if (hint && !na) {
-        // Anchor the hint between the two buttons (over the OR divider), centered —
-        // not following the cursor down onto the email field.
-        const orEl = (hint.querySelector && hint.querySelector('.studio-or')) || hint;
-        const hr = orEl.getBoundingClientRect();
-        const fr = hint.getBoundingClientRect();
-        left = fr.left + fr.width / 2 - tip.offsetWidth / 2;
-        top = hr.top + hr.height / 2 - tip.offsetHeight / 2;
-      } else {
-        left = e.clientX + 14; top = e.clientY + 16;
-        if (left + tip.offsetWidth + 12 > window.innerWidth) left = e.clientX - tip.offsetWidth - 14;
-        if (top + tip.offsetHeight + 12 > window.innerHeight) top = e.clientY - tip.offsetHeight - 14;
-      }
+      let left = e.clientX + 14, top = e.clientY + 16;
+      if (left + tip.offsetWidth + 12 > window.innerWidth) left = e.clientX - tip.offsetWidth - 14;
+      if (top + tip.offsetHeight + 12 > window.innerHeight) top = e.clientY - tip.offsetHeight - 14;
       tip.style.left = Math.max(12, left) + 'px';
       tip.style.top = Math.max(12, top) + 'px';
     });
