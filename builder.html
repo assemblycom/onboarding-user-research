@@ -5298,6 +5298,14 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.querySelectorAll('[data-step]').forEach(function(el) {
         el.setAttribute('data-status', 'done');
       });
+      // Resume skips the live build loop, so explicitly complete the terminal
+      // "App built" node and post the "Done!" confirmation the chat would show.
+      document.querySelectorAll('.asm-plan-todos-end').forEach(function(el) {
+        el.setAttribute('data-status', 'done');
+      });
+      if (scroll && !scroll.querySelector('[data-id="build-done"]')) {
+        appendMsg(scroll, 'agent', "Done! Your app is live in the preview on the right. Take a look — let me know what to refine.", 'build-done');
+      }
       if (!resumeDoneOnly) {
         STATE.isPublished = true;
         STATE.upToDate = true; // already published, nothing to re-publish
