@@ -389,13 +389,19 @@
   }
 
   function openPortalIntro() {
-    // Guard: only redirect to the CRM if the user has never engaged the test client
-    // there (Explore not even started). Once they've been through the CRM coachmark
-    // (in-progress) they can open the portal directly — but note this direct route
-    // does NOT complete "Explore"; that only happens via the CRM (from=crm.html).
+    // First-timers must pass the CRM tutorial before opening the portal freely.
+    // "Passed" = they opened the portal as the test client FROM the CRM, which is
+    // the only thing that sets explore='done'. Until then we funnel them to the CRM.
     var exp; try { exp = (get() || {}).explore; } catch (e) {}
-    if (exp !== 'progress' && exp !== 'done') { showClientFirst(); return; }
-    location.href = 'portal.html' + navSuffix();
+    if (exp === 'done') { location.href = 'portal.html' + navSuffix(); return; }
+    // On the CRM itself there's nowhere to redirect — opening the portal here IS the
+    // completion path, so route through from=crm.html (which marks Explore done).
+    if (location.pathname.indexOf('crm.html') > -1) {
+      var sfx = navSuffix();
+      location.href = 'portal.html#from=crm.html' + (sfx ? '&' + sfx.slice(1) : '');
+      return;
+    }
+    showClientFirst();
   }
   window.ftuxOpenPortalIntro = openPortalIntro;
 
