@@ -18,7 +18,7 @@
 
   // Clickable-looking things that often lack a pointer cursor (flat tabs and
   // settings rows). Inactive tabs / these rows are decorative in the prototype.
-  var EXTRA = '.tab, .preview-tab, .asset-row';
+  var EXTRA = '.tab, .preview-tab, .asset-row, .canvas';
 
   function isLive(el) {
     // The active tab is the current view, not a dead control.
