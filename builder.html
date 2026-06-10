@@ -379,7 +379,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Resume where the user left off, skipping the Q&A + reasoning typing:
         //   published → done; building → mid-build; plan already built → ready plan.
         if (_a.status === 'published') { FF = '3'; window.__asmResumePublished = true; }
-        else if (_a.phase === 'building' || _a.phase === 'done') { FF = '2'; window.__asmResumeBuild = true; }
+        // A build that's done (or was in progress — it finishes in the background)
+        // resumes straight to the finished app, NOT the paused mid-build state.
+        else if (_a.phase === 'building' || _a.phase === 'done') { FF = '3'; window.__asmResumeDone = true; }
         else if (_a.phase === 'plan') { FF = '1'; window.__asmResumePlan = true; }
         break;
       }
@@ -3286,7 +3288,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     // On resume (returning to a build already in progress) the assistant has
     // already "thought" — drop the typewriter and render the text at once.
-    if (window.__asmResumePlan || window.__asmResumeBuild || window.__asmResumePublished) {
+    if (window.__asmResumePlan || window.__asmResumeBuild || window.__asmResumePublished || window.__asmResumeDone) {
       var instant = document.createElement('div');
       instant.className = 'asm-msg-agent';
       if (id) { instant.setAttribute('data-id', id); renderedFlags[id] = true; }
@@ -5251,11 +5253,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     if (FF === '3') {
-      // Done state, app already published (and up to date). Used both for
-      // capture and for resuming a published app the user navigated back into.
+      // Done state. Used for capture, for resuming a published app, and for
+      // resuming a finished-but-unpublished app (__asmResumeDone) — the latter
+      // shows the built app without the published checkpoint.
+      var resumeDoneOnly = !!window.__asmResumeDone && !window.__asmResumePublished;
       STATE.phase = 'done';
-      STATE.isPublished = true;
-      STATE.upToDate = true; // already published, nothing to re-publish
       STATE.appTitle = APP_NAME;
       // Mount plan v1 + advance progress to "all done" so the chat shows
       // the full plan as completed.
@@ -5263,11 +5265,15 @@ document.addEventListener('DOMContentLoaded', async function() {
       document.querySelectorAll('[data-step]').forEach(function(el) {
         el.setAttribute('data-status', 'done');
       });
-      // Record a published checkpoint so the app reads as published
-      // (clears the sidebar "Draft" badge, which keys off this).
-      STATE.appVersion = 1;
-      document.body.classList.add('asm-published');
-      appendVersionBlock(scroll, 'Initial version published', 'publish-v1');
+      if (!resumeDoneOnly) {
+        STATE.isPublished = true;
+        STATE.upToDate = true; // already published, nothing to re-publish
+        // Record a published checkpoint so the app reads as published
+        // (clears the sidebar "Draft" badge, which keys off this).
+        STATE.appVersion = 1;
+        document.body.classList.add('asm-published');
+        appendVersionBlock(scroll, 'Initial version published', 'publish-v1');
+      }
       return;
     }
 
