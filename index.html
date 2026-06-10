@@ -708,9 +708,8 @@
     authVia = 'email';
     const email = (welcomeEmail && welcomeEmail.value.trim()) || '';
     const ue = document.getElementById('userEmail'); if (ue) ue.value = email;
-    const me = document.getElementById('magicEmail'); if (me) me.textContent = email || 'your email';
-    resetEmailStep();
-    showAuthStep('email');
+    // Skip the 6-digit email verification step — go straight to workspace details.
+    proceedFromEmail();
   });
 
   if (codeVerify) codeVerify.addEventListener('click', proceedFromEmail);
