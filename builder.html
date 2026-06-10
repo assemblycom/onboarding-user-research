@@ -1395,6 +1395,12 @@ document.addEventListener('DOMContentLoaded', async function() {
       '.asm-composer-bar [data-asm-na]::after{content:attr(data-asm-na);position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);white-space:nowrap;background:#1a1a1a;color:#fff;font-size:12px;font-weight:400;line-height:1;padding:7px 10px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .12s ease;box-shadow:0 4px 14px rgba(0,0,0,0.18);z-index:30;}' +
       '.asm-composer-bar [data-asm-na]::before{content:"";position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1a1a;opacity:0;transition:opacity .12s ease;}' +
       '.asm-composer-bar [data-asm-na]:hover::after,.asm-composer-bar [data-asm-na]:hover::before{opacity:1;}',
+      // Done phase: refining isn't wired in this prototype — lock the composer
+      // and, on hover, explain the app is ready to publish.
+      '.asm-composer.asm-na .asm-composer-box{position:relative;cursor:default;}' +
+      '.asm-composer.asm-na .asm-textarea,.asm-composer.asm-na .asm-composer-bar{pointer-events:none;}' +
+      '.asm-composer.asm-na .asm-composer-box::after{content:attr(data-asm-na);position:absolute;left:14px;right:14px;bottom:calc(100% + 10px);background:#1a1a1a;color:#fff;font-size:12px;font-weight:400;line-height:1.45;padding:9px 12px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .12s ease;box-shadow:0 6px 18px rgba(0,0,0,0.2);z-index:40;text-align:left;}' +
+      '.asm-composer.asm-na .asm-composer-box:hover::after{opacity:1;}',
       '.asm-attach:hover { background:rgba(16,16,16,0.04); color:#101010; }',
       // Voice button sits to the left of Send. Picks up margin-left:auto so
       // it pushes itself + Send to the right, aligning with the prior Send-only layout.
@@ -5074,22 +5080,26 @@ document.addEventListener('DOMContentLoaded', async function() {
         // the user pauses the build — so they can request a refinement,
         // which stops the build and pushes a new plan version.
         var v4PausedBuild = STATE.phase === 'building' && STATE.buildPaused;
-        var composerActive = STATE.phase === 'done'
-                          || STATE.phase === 'plan'
-                          || v4PausedBuild;
-        if (composerActive) {
+        var composerActive = STATE.phase === 'plan' || v4PausedBuild;   // 'done' is locked below
+        var composerBox = wrap.querySelector('.asm-composer-box');
+        if (STATE.phase === 'done') {
+          // Refining isn't part of this prototype — lock the composer and, on
+          // hover, point the user to Publish (the app is built and ready).
+          ta.disabled = true;
+          wrap.classList.add('disabled', 'asm-na');
+          ta.placeholder = 'How might you improve your app?';
+          if (composerBox) composerBox.setAttribute('data-asm-na', 'Not part of this prototype — your app is built and ready to publish (top right).');
+        } else if (composerActive) {
+          wrap.classList.remove('asm-na');
+          if (composerBox) composerBox.removeAttribute('data-asm-na');
           if (ta.disabled) {
             ta.disabled = false;
             wrap.classList.remove('disabled');
           }
-          if (STATE.phase === 'done') {
-            ta.placeholder = 'How might you improve your app?';
-          } else if (v4PausedBuild) {
-            ta.placeholder = 'Paused — type to revise the plan…';
-          } else {
-            ta.placeholder = 'Type to revise the plan';
-          }
+          ta.placeholder = v4PausedBuild ? 'Paused — type to revise the plan…' : 'Type to revise the plan';
         } else {
+          wrap.classList.remove('asm-na');
+          if (composerBox) composerBox.removeAttribute('data-asm-na');
           if (!ta.disabled) {
             ta.disabled = true;
             wrap.classList.add('disabled');
