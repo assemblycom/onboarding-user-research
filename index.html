@@ -273,13 +273,16 @@
       <p class="studio-sub">Enter the 6-digit code we sent to <strong id="magicEmail" style="font-weight:500;color:#212b36">your email</strong>.</p>
 
       <div id="codeFallback">
-        <div class="studio-code" id="codeInputs">
-          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
-          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
-          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
-          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
-          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
-          <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+        <div class="code-hint-wrap">
+          <div class="studio-code" id="codeInputs">
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 1" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 2" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 3" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 4" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 5" />
+            <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit 6" />
+          </div>
+          <div class="code-hint">Enter any code — this is a prototype</div>
         </div>
         <button class="studio-primary" id="codeVerify" type="button" style="margin-top:20px">Verify &amp; continue</button>
       </div>
@@ -688,6 +691,11 @@
       '.studio-code{display:flex;justify-content:center;gap:10px;margin-top:26px;}' +
       '.studio-code input{width:46px;height:56px;text-align:center;font-size:22px;font-weight:400;color:#212b36;font-family:inherit;border:1px solid #d3d6db;border-radius:10px;background:#fff;outline:none;transition:border-color .12s,box-shadow .12s;-moz-appearance:textfield;}' +
       '.studio-code input:focus{border-color:#9aa0a6;box-shadow:0 0 0 3px rgba(0,0,0,0.05);}' +
+      // Prototype hint: hovering the code boxes explains any code works.
+      '.code-hint-wrap{position:relative;}' +
+      '.code-hint{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:10px;white-space:nowrap;background:#1a1a1a;color:#fff;font-size:13px;font-weight:400;line-height:1;padding:8px 12px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .15s ease;box-shadow:0 6px 20px rgba(0,0,0,0.18);z-index:5;}' +
+      '.code-hint::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1a1a;}' +
+      '.code-hint-wrap:hover .code-hint{opacity:1;}' +
       '#codeFallback:not([hidden]){display:flex;flex-direction:column;align-items:center;}' +
       '.studio-help{margin-top:30px;display:flex;flex-direction:column;gap:9px;align-items:center;}' +
       '.studio-help p{margin:0;font-size:14px;color:#6b6f76;text-align:center;line-height:1.5;}' +
