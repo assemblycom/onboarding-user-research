@@ -68,8 +68,14 @@
       '.inv-foot{padding:16px 22px 22px;flex-shrink:0;}' +
       '.inv-btn{width:100%;height:44px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;}' +
       '.inv-btn:hover{background:#000;}' +
+      '.inv-btn:disabled{background:#e7e9ec;color:#a8acb3;cursor:default;}' +
       '.inv-later{display:block;width:100%;margin-top:8px;padding:8px;background:none;border:none;font-family:inherit;font-size:13px;color:#6b6f76;cursor:pointer;}' +
       '.inv-later:hover{color:#212b36;}' +
+      '.inv-success{align-items:center;text-align:center;padding-top:8px;}' +
+      '.inv-check-circle{width:56px;height:56px;border-radius:50%;background:#e9f6ec;color:#3a9d5d;display:flex;align-items:center;justify-content:center;margin:8px auto 18px;}' +
+      '.inv-check-circle svg{width:30px;height:30px;}' +
+      '.inv-sent{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:18px;}' +
+      '.inv-sent span{background:#f1f3f5;border-radius:6px;padding:4px 10px;font-size:13px;color:#212b36;}' +
       // ── "Explore the client experience" interstitial (shown before the portal) ──
       '.pi-ov{position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,0.42);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;font-family:Inter,system-ui,sans-serif;}' +
       '.pi-ov.show{opacity:1;pointer-events:auto;}' +
@@ -168,6 +174,7 @@
     function syncInviteCount() {
       var n = chipBox.querySelectorAll('.inv-chip').length;
       inviteBtn.textContent = n ? 'Invite ' + n + (n > 1 ? ' members' : ' member') : 'Invite';
+      inviteBtn.disabled = !n;
     }
     function addChip(email) {
       email = (email || '').trim().replace(/,$/, '');
@@ -202,8 +209,29 @@
     }
     // Clicking anywhere in the box focuses the text input.
     if (chipBox) chipBox.addEventListener('click', function (e) { if (e.target === chipBox) emailInput && emailInput.focus(); });
-    inviteBtn.addEventListener('click', completeInvite);
+    // Clicking Invite confirms with a success state (the button is disabled
+    // until at least one email is added); "Maybe later" just closes.
+    function showInviteSuccess() {
+      var emails = [].map.call(chipBox.querySelectorAll('.inv-chip'), function (c) { return c.getAttribute('data-email'); });
+      var n = emails.length;
+      if (!n) return;
+      var modal = ov.querySelector('.inv-modal');
+      var check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      modal.innerHTML = '<div class="inv-banner"></div>' +
+        '<div class="inv-body inv-success">' +
+        '<div class="inv-check-circle">' + check + '</div>' +
+        '<h2 class="inv-title">' + (n > 1 ? n + ' invitations sent' : 'Invitation sent') + '</h2>' +
+        '<p class="inv-sub">' + (n > 1 ? 'Your teammates' : 'Your teammate') + ' will get an email to join Studio.</p>' +
+        '<div class="inv-sent">' + emails.map(function (e) { return '<span></span>'; }).join('') + '</div>' +
+        '</div>' +
+        '<div class="inv-foot"><button class="inv-btn">Done</button></div>';
+      var sent = modal.querySelectorAll('.inv-sent span');
+      emails.forEach(function (e, i) { sent[i].textContent = e; });
+      modal.querySelector('.inv-btn').addEventListener('click', completeInvite);
+    }
+    inviteBtn.addEventListener('click', function () { if (!inviteBtn.disabled) showInviteSuccess(); });
     ov.querySelector('.inv-later').addEventListener('click', completeInvite);
+    syncInviteCount();
     return ov;
   }
   function openInvite() { ensureModal().classList.add('show'); }
