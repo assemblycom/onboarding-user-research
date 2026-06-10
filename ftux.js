@@ -468,7 +468,7 @@
     (function () {
       [].forEach.call(cl.querySelectorAll('.checklist-item'), function (it) {
         var txt = it.textContent;
-        if (txt.indexOf('Create test client') > -1 || txt.indexOf('Meet your test client') > -1) it.style.display = 'none';
+        if (txt.indexOf('Create test client') > -1 || txt.indexOf('Meet your test client') > -1 || txt.indexOf('Invite your team') > -1) it.style.display = 'none';
       });
     })();
 
