@@ -633,6 +633,7 @@
           document.getElementById('crmCoachLater').textContent = 'Back';
           open.querySelector('.coach-label').textContent = 'Open portal';
           markExploreProgress();   // seeing the magic-link card half-lights "Explore"
+          try { localStorage.setItem('onb.crmCoachStep2', '1'); } catch (e) {}   // remember they advanced, so a return visit resumes here
           // Step 2 is about the action → drop the row highlight, point at the ••• only
           // and open its menu. The card stays pinned bottom-right (positionCoach).
           if (row) row.classList.remove('spotlight');
@@ -648,10 +649,11 @@
         markClientDone();   // seeing card 1 completes "Meet your test client"
         const row = tbody.querySelector('tr');
         if (row) row.classList.add('spotlight');
-        // Resume where they left off: if they already advanced past the intro
-        // (explore is in-progress), jump straight to the last step.
-        var exp; try { exp = (JSON.parse(localStorage.getItem('onb.ftux')) || {}).explore; } catch (e) {}
-        renderCoachB(exp === 'progress' ? 2 : 1);
+        // Resume where they left off: only if they actually advanced to step 2
+        // on a prior visit (a dedicated flag — NOT explore's 'progress', which the
+        // boot sets just by landing on the CRM and would skip the intro card).
+        var seen2 = false; try { seen2 = localStorage.getItem('onb.crmCoachStep2') === '1'; } catch (e) {}
+        renderCoachB(seen2 ? 2 : 1);
         requestAnimationFrame(function () { positionCoach(); coach.classList.add('show'); });
       }
       function closeCoach() {

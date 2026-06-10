@@ -941,7 +941,7 @@
     // would otherwise persist from a previous session in the same browser).
     // Reset onboarding PROGRESS, but keep the prompt the user just entered so it
     // survives into the Add-app page even if the URL hash is somehow dropped.
-    try { localStorage.removeItem('onb.ftux'); localStorage.removeItem('onb.ftuxDone'); localStorage.removeItem('onb.portalIntroSeen'); localStorage.removeItem('onb.buildApp'); localStorage.removeItem('onb.buildApps'); localStorage.removeItem('onb.crmClient'); } catch (e) {}
+    try { localStorage.removeItem('onb.ftux'); localStorage.removeItem('onb.ftuxDone'); localStorage.removeItem('onb.portalIntroSeen'); localStorage.removeItem('onb.buildApp'); localStorage.removeItem('onb.buildApps'); localStorage.removeItem('onb.crmClient'); localStorage.removeItem('onb.crmCoachStep2'); } catch (e) {}
     try { if (currentPrompt) localStorage.setItem('onb.studioPrompt', currentPrompt); } catch (e) {}
     // Land on the in-portal "Add App" build page first. The prompt the
     // user typed (or chose via a chip) carries over and pre-fills the
