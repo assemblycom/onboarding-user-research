@@ -81,6 +81,7 @@
     .notif-detail-ic svg { width: 19px; height: 19px; }
     .notif-detail-title { font-size: 19px; font-weight: 500; margin: 0 0 8px; }
     .notif-detail-sub { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 360px; margin: 0 0 22px; }
+    .notif-detail .btn-dark { font-size: 13px; padding: 9px 16px; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -173,12 +174,13 @@
     // If a built-but-unpublished app exists, surface a "your app is ready"
     // notification that deep-links back to the builder to publish.
     (function () {
-      var app = null;
+      var app = null, read = false;
       try { var l = JSON.parse(localStorage.getItem('onb.buildApps')); if (Array.isArray(l)) app = l.filter(function (a) { return a && a.name && a.status !== 'published'; }).pop(); } catch (e) {}
+      try { read = localStorage.getItem('onb.appReadyNotifRead') === '1'; } catch (e) {}
       var main = document.querySelector('.main');
-      if (!app || !main) return;
+      if (!app || read || !main) return;   // once opened (read), the notification no longer shows
       var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-      var go = function () { location.href = 'builder.html' + (app.hash || navSuffix); };
+      var go = function () { try { localStorage.setItem('onb.appReadyNotifRead', '1'); } catch (e) {} location.href = 'builder.html' + (app.hash || navSuffix); };
       var empty = main.querySelector('.empty'); if (empty) empty.remove();
       var wrap = document.createElement('div');
       wrap.className = 'notif-wrap';
@@ -203,7 +205,7 @@
       document.getElementById('notifPublish').addEventListener('click', go);
     })();
   </script>
-  <script src="ftux.js?v=47"></script>
+  <script src="ftux.js?v=48"></script>
   <script src="apps-nav.js?v=6"></script>
   <script src="prototype-hints.js?v=6"></script>
 </body>

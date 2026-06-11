@@ -447,7 +447,11 @@
   // the "your app is ready to publish" notification is noticed while exploring.
   function badgeNotifs() {
     var hasDraft = false;
-    try { var l = JSON.parse(localStorage.getItem('onb.buildApps')); hasDraft = Array.isArray(l) && l.some(function (a) { return a && a.name && a.status !== 'published'; }); } catch (e) {}
+    try {
+      var l = JSON.parse(localStorage.getItem('onb.buildApps'));
+      var read = localStorage.getItem('onb.appReadyNotifRead') === '1';
+      hasDraft = !read && Array.isArray(l) && l.some(function (a) { return a && a.name && a.status !== 'published'; });
+    } catch (e) {}
     var link = document.querySelector('.nav-item[data-nav="notifications.html"]');
     if (!link) return;
     var badge = link.querySelector('.ftux-notif-badge');
