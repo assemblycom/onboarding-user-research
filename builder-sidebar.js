@@ -302,7 +302,7 @@
         '<a class="nav-item" data-nav="app-library.html"><img class="ic" src="assets/apps.svg" alt="" width="18" height="18" />App Library</a>' +
       '</nav>' +
       '<div class="spacer"></div>' +
-      '<div class="checklist">' +
+      '<div class="checklist" style="visibility:hidden">' +
         '<div class="checklist-title">Getting started</div>' +
         '<div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Publish your first app</div>' +
         '<div class="checklist-item"><img class="ic" src="assets/todo.svg" alt="" width="14" height="14" />Create test client</div>' +

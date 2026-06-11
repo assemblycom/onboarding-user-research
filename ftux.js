@@ -305,6 +305,9 @@
     });
     var fill = cl.querySelector('.ftux-bar-fill');
     if (fill) fill.style.width = Math.max(7, Math.round(doneCount / Math.max(1, visCount) * 100)) + '%';
+    // Reveal the card only once it's fully rendered — the static HTML starts
+    // hidden so the pre-JS state (all-todo, no bar) never flashes on load.
+    if (cl.style.visibility === 'hidden') cl.style.visibility = 'visible';
     // Everything complete → show the all-done state briefly, then retire the card.
     if (visCount > 0 && doneCount === visCount) finishFtux(cl);
   }
