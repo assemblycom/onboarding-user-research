@@ -46,7 +46,7 @@
     })();
   </script>
   <!-- Shared Studio sidebar + Getting-started FTUX, injected into the bundle. -->
-  <script src="ftux.js?v=52"></script>
+  <script src="ftux.js?v=53"></script>
   <script src="builder-sidebar.js?v=23"></script>
 </head>
 <body>
@@ -4242,6 +4242,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     //    the next ensureShell() narrows the shell and reveals the preview
     //    pane on the right.
     STATE.phase = 'building';
+    // Persist the build phase so the "app is ready" notification only fires once
+    // the app is actually built (not during Q&A / planning).
+    try { var _bkb = 'onb.buildApps'; var _blb = JSON.parse(localStorage.getItem(_bkb)) || []; _blb.forEach(function (a) { if (a && a.name && a.name.toLowerCase() === (APP_NAME || '').toLowerCase() && a.status !== 'published') a.phase = 'building'; }); localStorage.setItem(_bkb, JSON.stringify(_blb)); } catch (e) {}
     // Offset the clock so step execution begins only after the steps have
     // progressively revealed (shimmered in) — planning finishes, then build.
     STATE.buildStart = Date.now() + 3700;
@@ -5153,6 +5156,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (elapsed >= BUILD_DURATION && !buildAppliedDone) {
           buildAppliedDone = true;
           STATE.phase = 'done';
+          // Persist done so the "app is ready to publish" notification can fire.
+          try { var _bkd = 'onb.buildApps'; var _bld = JSON.parse(localStorage.getItem(_bkd)) || []; _bld.forEach(function (a) { if (a && a.name && a.name.toLowerCase() === (APP_NAME || '').toLowerCase() && a.status !== 'published') a.phase = 'done'; }); localStorage.setItem(_bkd, JSON.stringify(_bld)); } catch (e) {}
           // Light up the terminal "App built" node on the Todos timeline.
           document.querySelectorAll('.asm-plan-todos-end').forEach(function(el) {
             el.setAttribute('data-status', 'done');

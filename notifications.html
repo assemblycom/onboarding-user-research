@@ -175,7 +175,7 @@
     // notification that deep-links back to the builder to publish.
     (function () {
       var app = null, read = false;
-      try { var l = JSON.parse(localStorage.getItem('onb.buildApps')); if (Array.isArray(l)) app = l.filter(function (a) { return a && a.name && a.status !== 'published'; }).pop(); } catch (e) {}
+      try { var l = JSON.parse(localStorage.getItem('onb.buildApps')); if (Array.isArray(l)) app = l.filter(function (a) { return a && a.name && a.status !== 'published' && a.phase === 'done'; }).pop(); } catch (e) {}
       try { read = localStorage.getItem('onb.appReadyNotifRead') === '1'; } catch (e) {}
       var main = document.querySelector('.main');
       if (!app || read || !main) return;   // once opened (read), the notification no longer shows
@@ -205,7 +205,7 @@
       document.getElementById('notifPublish').addEventListener('click', go);
     })();
   </script>
-  <script src="ftux.js?v=52"></script>
+  <script src="ftux.js?v=53"></script>
   <script src="apps-nav.js?v=6"></script>
   <script src="prototype-hints.js?v=6"></script>
 </body>

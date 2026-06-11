@@ -473,7 +473,7 @@
     try {
       var l = JSON.parse(localStorage.getItem('onb.buildApps'));
       var read = localStorage.getItem('onb.appReadyNotifRead') === '1';
-      hasDraft = !read && Array.isArray(l) && l.some(function (a) { return a && a.name && a.status !== 'published'; });
+      hasDraft = !read && Array.isArray(l) && l.some(function (a) { return a && a.name && a.status !== 'published' && a.phase === 'done'; });
     } catch (e) {}
     var link = document.querySelector('.nav-item[data-nav="notifications.html"]');
     if (!link) return;
