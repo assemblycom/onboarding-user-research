@@ -691,7 +691,9 @@
   function proceedFromEmail() {
     const email = (document.getElementById('userEmail')?.value || (welcomeEmail && welcomeEmail.value) || '').trim();
     if (window.__asmPrefillWorkspace) window.__asmPrefillWorkspace(email);
-    showAuthStep(2);
+    // Skip the workspace-details step for the prototype — go straight to the
+    // provisioning loader, then into the workspace.
+    goToBuilder();
   }
 
   // Back to the clean "click the link" state (used each time we enter the step).
@@ -819,7 +821,8 @@
       // portal URL is derived from it, so it shouldn't be left blank.
       const co = document.getElementById('companyName');
       if (co && !co.value.trim()) { co.value = 'Test Company'; co.dispatchEvent(new Event('input')); }
-      showAuthStep(2);
+      // Skip the workspace-details step for the prototype — straight to the loader.
+      goToBuilder();
     }, 1200);
   }
 

@@ -5186,7 +5186,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.body.appendChild(flash);
             setTimeout(function() { if (flash.parentNode) flash.parentNode.removeChild(flash); }, 1300);
           }
-          var doneMsg = "Done! Your app is live in the preview on the right. Take a look — let me know what to refine.";
+          var doneMsg = "Done! Your app is built and ready to publish. Take a look in the preview on the right, then hit Publish (top right) when you're ready.";
           if (thinkingEl) {
             resolveThinking(thinkingEl, doneMsg);
           } else {
@@ -5325,7 +5325,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         el.setAttribute('data-status', 'done');
       });
       if (scroll && !scroll.querySelector('[data-id="build-done"]')) {
-        appendMsg(scroll, 'agent', "Done! Your app is live in the preview on the right. Take a look — let me know what to refine.", 'build-done');
+        appendMsg(scroll, 'agent', "Done! Your app is built and ready to publish. Take a look in the preview on the right, then hit Publish (top right) when you're ready.", 'build-done');
       }
       if (!resumeDoneOnly) {
         STATE.isPublished = true;
