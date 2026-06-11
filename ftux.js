@@ -424,8 +424,8 @@
     ov.style.setProperty('--pi-tx', t[1]);
     ov.innerHTML = '<div class="pi-card">' +
       '<div class="pi-left">' +
-        '<h2 class="pi-title">First, meet your test client</h2>' +
-        '<p class="pi-copy">We’ve added a test client to your CRM. Head there to meet them, then open your portal as them to see what your clients see — we’ll guide you.</p>' +
+        '<h2 class="pi-title">Let’s set up your client preview</h2>' +
+        '<p class="pi-copy">To preview the client experience, you’ll first need to open the test client we created for you. From there, you can launch the portal and see exactly what your clients will experience.</p>' +
         '<div class="cf-actions" style="margin-top:auto;"><button class="cf-cancel" type="button">Not now</button><button class="cf-go" type="button">Go to CRM</button></div>' +
       '</div>' +
       '<div class="pi-right"><div class="pi-portal">' +
