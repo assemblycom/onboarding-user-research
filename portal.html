@@ -127,6 +127,21 @@
     .signin-skip { display: inline-block; margin-top: 18px; background: none; border: none; font-family: inherit; font-size: 13px; color: var(--muted); cursor: pointer; }
     .signin-skip:hover { color: var(--text); }
     .signin-foot { margin-top: 28px; font-size: 12px; color: #9aa0a6; }
+
+    /* Client-facing Requests app view */
+    .rq-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .rq-new { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; background: #1a1a1a; color: #fff; border: none; border-radius: 8px; padding: 9px 14px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .rq-new:hover { background: #000; }
+    .rq-table { width: 100%; border-collapse: collapse; margin-top: 22px; }
+    .rq-table th { text-align: left; font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); padding: 0 14px 11px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .rq-table td { padding: 14px; border-bottom: 1px solid #eef0f2; font-size: 13.5px; color: var(--text); vertical-align: middle; }
+    .rq-table tbody tr:last-child td { border-bottom: 0; }
+    .rq-req { font-weight: 500; }
+    .rq-badge { display: inline-flex; align-items: center; padding: 2px 9px; border-radius: 6px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .rq-badge.open { background: #e1edff; color: #2456c7; }
+    .rq-badge.review { background: #fdeccb; color: #946200; }
+    .rq-badge.resolved { background: #d8f0df; color: #1d7a45; }
+    .rq-badge.closed { background: #eceef1; color: #6b6f76; }
   </style>
 </head>
 <body>
@@ -166,8 +181,8 @@
 
     <!-- Main -->
     <main class="main">
-      <div class="crumb">Home</div>
-      <div class="content">
+      <div class="crumb" id="crumb">Home</div>
+      <div class="content" id="homeView">
         <h1 class="hello" id="hello">Good morning</h1>
         <p class="hello-sub">Here's what needs your attention today</p>
 
@@ -196,6 +211,24 @@
           <div class="how-item"><div class="ht"><b>Billing</b><br><span>Here you will see any active subscriptions you have and any invoices after we send them to you.</span></div></div>
           <div class="how-item"><div class="ht"><b>Helpdesk</b><br><span>Access a collection of helpful articles we have put together.</span></div></div>
         </div>
+      </div>
+
+      <!-- Client-facing Requests app view (shown when the published app is opened) -->
+      <div class="content" id="requestsView" hidden>
+        <div class="rq-head">
+          <h1 class="hello">Requests</h1>
+          <button class="rq-new" type="button">+ New request</button>
+        </div>
+        <p class="hello-sub">Submit a request and track its status.</p>
+        <table class="rq-table">
+          <thead><tr><th>Request</th><th>Type</th><th>Submitted</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="rq-req">New brand guidelines</td><td>Design</td><td>Apr 10</td><td><span class="rq-badge review">In review</span></td></tr>
+            <tr><td class="rq-req">Q3 campaign assets</td><td>Content</td><td>Apr 8</td><td><span class="rq-badge open">Open</span></td></tr>
+            <tr><td class="rq-req">Website copy review</td><td>Content</td><td>Apr 5</td><td><span class="rq-badge resolved">Resolved</span></td></tr>
+            <tr><td class="rq-req">Invoice question</td><td>Billing</td><td>Apr 2</td><td><span class="rq-badge closed">Closed</span></td></tr>
+          </tbody>
+        </table>
       </div>
     </main>
   </div>
@@ -249,9 +282,27 @@
       var CLOCK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>';
       var a = document.createElement('a');
       a.className = 'side-item';
+      a.setAttribute('data-live', '1');   // real, working nav item — no proto hint
       a.innerHTML = CLOCK;
       a.appendChild(document.createTextNode(app.name));
       nav.appendChild(a);   // after Messages (last item)
+
+      // Clicking the app opens its client view; Home returns to the portal home.
+      var homeView = document.getElementById('homeView');
+      var reqView = document.getElementById('requestsView');
+      var crumb = document.getElementById('crumb');
+      var homeItem = nav.querySelector('.side-item');   // first item = Home
+      function showView(which) {
+        var isReq = which === 'requests';
+        if (homeView) homeView.hidden = isReq;
+        if (reqView) reqView.hidden = !isReq;
+        if (crumb) crumb.textContent = isReq ? app.name : 'Home';
+        [].forEach.call(nav.querySelectorAll('.side-item'), function (n) { n.classList.remove('active'); });
+        (isReq ? a : homeItem).classList.add('active');
+        document.querySelector('.main').scrollTop = 0;
+      }
+      a.addEventListener('click', function () { showView('requests'); });
+      if (homeItem) homeItem.addEventListener('click', function () { showView('home'); });
     })();
 
     // ── Branded sign-in preview (arriving with #signin=1) ──
