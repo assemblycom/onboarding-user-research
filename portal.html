@@ -225,7 +225,9 @@
     const ipWs = document.getElementById('ipWs'); if (ipWs) ipWs.textContent = company.trim().split(/\s+/)[0];
     const ipAvatar = document.getElementById('ipAvatar'); if (ipAvatar) ipAvatar.textContent = company.trim()[0].toUpperCase();
     const [abg, afg] = avatarColor(company); sa.style.background = abg; sa.style.color = afg;
-    document.getElementById('hello').textContent = first ? ('Good morning, ' + first) : 'Good morning';
+    // This portal is always the studio owner previewing as their test client, so
+    // greet the client (Test Client), not the signed-in studio user.
+    document.getElementById('hello').textContent = 'Good morning, Test Client';
     document.getElementById('aboutText').textContent = company + ', a full-service marketing agency that helps businesses increase their brand awareness, attract new customers, and grow their bottom line. We specialize in crafting unique and effective marketing strategies that align with your business goals and help you stand out in a crowded marketplace.';
     document.getElementById('filesCo').textContent = company;
 
