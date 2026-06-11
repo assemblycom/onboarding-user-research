@@ -23,6 +23,7 @@
     css.textContent =
       '.ftux-bar{height:4px;border-radius:99px;background:#e7e9ec;overflow:hidden;margin:0 0 12px;}' +
       '.ftux-bar-fill{height:100%;background:#1a1a1a;border-radius:99px;transition:width .35s ease;}' +
+      '.ftux-notif-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#3a9d5d;color:#fff;font-size:11px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}' +
       '.checklist-item{cursor:pointer;border-radius:6px;margin:0 -8px;padding:6px 8px;gap:8px;transition:background .12s;}' +
       '.checklist-item:hover{background:var(--bg-hover,#eff1f4);}' +
       '.checklist-item.ftux-done{color:#8a9099;}' +
@@ -442,8 +443,21 @@
   }
   window.ftuxOpenPortalIntro = openPortalIntro;
 
+  // Badge the Notifications nav item while a built-but-unpublished app exists, so
+  // the "your app is ready to publish" notification is noticed while exploring.
+  function badgeNotifs() {
+    var hasDraft = false;
+    try { var l = JSON.parse(localStorage.getItem('onb.buildApps')); hasDraft = Array.isArray(l) && l.some(function (a) { return a && a.name && a.status !== 'published'; }); } catch (e) {}
+    var link = document.querySelector('.nav-item[data-nav="notifications.html"]');
+    if (!link) return;
+    var badge = link.querySelector('.ftux-notif-badge');
+    if (hasDraft && !badge) { badge = document.createElement('span'); badge.className = 'ftux-notif-badge'; badge.textContent = '1'; link.appendChild(badge); }
+    else if (!hasDraft && badge) { badge.remove(); }
+  }
+
   function ftuxInit() {
     ensureStyle();
+    badgeNotifs();
 
     var cl = document.querySelector('.checklist');
 

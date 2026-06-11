@@ -61,6 +61,25 @@
     .empty-sub { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 360px; margin: 0 0 20px; }
     .btn-dark { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--dark); border: 1px solid var(--dark); border-radius: 4px; font-size: 12px; font-weight: 500; color: #fff; cursor: pointer; font-family: inherit; transition: background 0.12s; }
     .btn-dark:hover { background: #000; }
+
+    /* Notification list + detail (shown when there's a built app to publish) */
+    .notif-wrap { flex: 1; display: flex; min-height: 0; }
+    .notif-list { width: 380px; max-width: 42%; flex-shrink: 0; border-right: 1px solid var(--border); overflow-y: auto; }
+    .notif-row { display: flex; align-items: flex-start; gap: 11px; padding: 15px 18px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.12s; }
+    .notif-row:hover { background: var(--bg-soft, #f8f9fb); }
+    .notif-row.selected { background: var(--bg-hover); }
+    .notif-ic { width: 30px; height: 30px; border-radius: 8px; background: #e9f6ec; color: #3a9d5d; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .notif-ic svg { width: 16px; height: 16px; }
+    .notif-body { flex: 1; min-width: 0; }
+    .notif-title { font-size: 13.5px; font-weight: 500; color: var(--text); line-height: 1.35; }
+    .notif-sub { font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+    .notif-meta { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    .notif-time { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .notif-dot { width: 7px; height: 7px; border-radius: 50%; background: #3a9d5d; flex-shrink: 0; margin-top: 6px; }
+    .notif-detail { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+    .notif-detail-ic { width: 52px; height: 52px; border-radius: 13px; background: #e9f6ec; color: #3a9d5d; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+    .notif-detail-title { font-size: 19px; font-weight: 500; margin: 0 0 8px; }
+    .notif-detail-sub { font-size: 14px; color: var(--muted); line-height: 1.5; max-width: 360px; margin: 0 0 22px; }
   </style>
 </head>
 <body>
@@ -149,8 +168,42 @@
     const navSuffix = navParams.length ? '#' + navParams.join('&') : '';
     document.querySelectorAll('[data-nav]').forEach(a => { a.setAttribute('href', a.dataset.nav + navSuffix); });
     (function(){ const purl = 'portal.html' + navSuffix; const op = document.querySelector('.open-portal'); if (op) op.addEventListener('click', function(){ location.href = purl; }); document.querySelectorAll('.checklist-item').forEach(function(it){ if (it.textContent.indexOf('Explore the client experience') > -1) { it.style.cursor = 'pointer'; it.addEventListener('click', function(){ location.href = purl; }); } }); })();
+
+    // If a built-but-unpublished app exists, surface a "your app is ready"
+    // notification that deep-links back to the builder to publish.
+    (function () {
+      var app = null;
+      try { var l = JSON.parse(localStorage.getItem('onb.buildApps')); if (Array.isArray(l)) app = l.filter(function (a) { return a && a.name && a.status !== 'published'; }).pop(); } catch (e) {}
+      var main = document.querySelector('.main');
+      if (!app || !main) return;
+      var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      var go = function () { location.href = 'builder.html' + (app.hash || navSuffix); };
+      var empty = main.querySelector('.empty'); if (empty) empty.remove();
+      var wrap = document.createElement('div');
+      wrap.className = 'notif-wrap';
+      wrap.innerHTML =
+        '<div class="notif-list">' +
+          '<div class="notif-row selected" id="notifApp">' +
+            '<span class="notif-ic">' + CHECK + '</span>' +
+            '<div class="notif-body"><div class="notif-title"></div><div class="notif-sub">Your app finished building</div></div>' +
+            '<div class="notif-meta"><span class="notif-time">Just now</span><span class="notif-dot"></span></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="notif-detail">' +
+          '<div class="notif-detail-ic">' + CHECK + '</div>' +
+          '<h2 class="notif-detail-title"></h2>' +
+          '<p class="notif-detail-sub">Your app finished building. Open the builder to review it and publish it to your client portal.</p>' +
+          '<button class="btn-dark" id="notifPublish" type="button">Open builder to publish</button>' +
+        '</div>';
+      main.appendChild(wrap);
+      var ready = app.name + ' is ready to publish';
+      wrap.querySelector('.notif-title').textContent = ready;
+      wrap.querySelector('.notif-detail-title').textContent = ready;
+      document.getElementById('notifApp').addEventListener('click', go);
+      document.getElementById('notifPublish').addEventListener('click', go);
+    })();
   </script>
-  <script src="ftux.js?v=44"></script>
+  <script src="ftux.js?v=45"></script>
   <script src="apps-nav.js?v=6"></script>
   <script src="prototype-hints.js?v=6"></script>
 </body>

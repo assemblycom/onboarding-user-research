@@ -46,7 +46,7 @@
     })();
   </script>
   <!-- Shared Studio sidebar + Getting-started FTUX, injected into the bundle. -->
-  <script src="ftux.js?v=44"></script>
+  <script src="ftux.js?v=45"></script>
   <script src="builder-sidebar.js?v=20"></script>
 </head>
 <body>
@@ -2818,6 +2818,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     STATE.isPublished = true;
     STATE.upToDate = true; // nothing left to publish until the next change
     document.body.classList.add('asm-published');
+    // Persist published state so the "app is ready" notification + Draft badge clear.
+    try {
+      var _pbk = 'onb.buildApps'; var _pbl = JSON.parse(localStorage.getItem(_pbk)) || [];
+      _pbl.forEach(function (a) { if (a && a.name && a.name.toLowerCase() === (APP_NAME || '').toLowerCase()) { a.status = 'published'; a.phase = 'done'; } });
+      localStorage.setItem(_pbk, JSON.stringify(_pbl));
+    } catch (e) {}
     // Post a Version block to the chat scroll documenting this publish.
     var scroll = document.querySelector('#asm-scroll');
     if (scroll) {
