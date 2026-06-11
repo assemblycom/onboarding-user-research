@@ -23,7 +23,7 @@
     css.textContent =
       '.ftux-bar{height:4px;border-radius:99px;background:#e7e9ec;overflow:hidden;margin:0 0 12px;}' +
       '.ftux-bar-fill{height:100%;background:#1a1a1a;border-radius:99px;transition:width .35s ease;}' +
-      '.ftux-notif-badge{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#115B3B;color:#fff;font-size:11px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}' +
+      '.ftux-notif-badge{margin-left:auto;min-width:20px;height:20px;padding:0 6px;border-radius:6px;background:#eff1f4;color:#6b6f76;font-size:11px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}' +
       '.checklist-item{cursor:pointer;border-radius:6px;margin:0 -8px;padding:6px 8px;gap:8px;transition:background .12s;}' +
       '.checklist-item:hover{background:var(--bg-hover,#eff1f4);}' +
       '.checklist-item.ftux-done{color:#8a9099;}' +
