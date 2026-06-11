@@ -5,6 +5,12 @@
       "headers": [
         { "key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate" }
       ]
+    },
+    {
+      "source": "/(.*\\.(?:js|css|svg|png|jpe?g|gif|webp|woff2?|ico))",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400" }
+      ]
     }
   ]
 }
