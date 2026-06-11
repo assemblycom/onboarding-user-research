@@ -438,13 +438,13 @@
   // Notifications tab isn't built for the prototype — neutralise its click and
   // show a "Not part of this prototype" tooltip on hover. Re-runs each tick so
   // it survives the bundle's React re-renders.
-  function disableNotifTab() {
+  function disableTab(label) {
     var btns = document.querySelectorAll('button');
     for (var i = 0; i < btns.length; i++) {
       var b = btns[i];
       var txt = '';
       for (var c = 0; c < b.childNodes.length; c++) { if (b.childNodes[c].nodeType === 3) txt += b.childNodes[c].textContent; }
-      if (txt.trim() !== 'Notifications') continue;
+      if (txt.trim() !== label) continue;
       var st = b.getAttribute('style') || '';
       // Top-tab signature (padding 4px 10px + 12px) — avoids matching anything else.
       if (st.indexOf('padding: 4px 10px') === -1 || st.indexOf('font-size: 12px') === -1) continue;
@@ -676,7 +676,8 @@
     rebrandText();
     relabelTimeTracker();
     fixPreviewIcons();
-    disableNotifTab();
+    disableTab('Notifications');
+    disableTab('Portal');
     disableLiveToggle();
     injectSriApp();
     var sb = findBundleSidebar();
