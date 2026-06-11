@@ -408,14 +408,34 @@
   function ensureClientFirst() {
     var ov = document.querySelector('.cf-ov');
     if (ov) return ov;
-    var CRM_IC = '<svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.17969 2.6375C1.17969 1.37504 2.20316 0.351562 3.46563 0.351562H10.9469C11.9807 0.351562 12.8172 1.18801 12.8172 2.22188V8.87188C12.8172 9.52129 12.4873 10.0928 11.9859 10.4279V12.4047H12.1938C12.5392 12.4047 12.8172 12.6826 12.8172 13.0281C12.8172 13.3736 12.5392 13.6516 12.1938 13.6516H3.25781C2.10965 13.6516 1.17969 12.7216 1.17969 11.5734V2.6375ZM2.42656 11.5734C2.42656 12.0332 2.79803 12.4047 3.25781 12.4047H10.7391V10.7422H3.25781C2.79803 10.7422 2.42656 11.1137 2.42656 11.5734ZM2.42656 9.66936C2.68113 9.55766 2.96168 9.49531 3.25781 9.49531H10.9469C11.2924 9.49531 11.5703 9.21736 11.5703 8.87188V2.22188C11.5703 1.87639 11.2924 1.59844 10.9469 1.59844H3.46563C2.89154 1.59844 2.42656 2.06342 2.42656 2.6375V9.66936ZM5.75156 4.50781C5.75156 3.81998 6.31061 3.26094 6.99844 3.26094C7.68627 3.26094 8.24531 3.81998 8.24531 4.50781C8.24531 5.19564 7.68627 5.75469 6.99844 5.75469C6.31061 5.75469 5.75156 5.19564 5.75156 4.50781ZM5.25801 8.04063C4.87355 8.04063 4.57742 7.68475 4.79043 7.36524C5.09955 6.89766 5.63207 6.58594 6.23732 6.58594H7.76215C8.3674 6.58594 8.89732 6.89506 9.20904 7.36524C9.41945 7.68475 9.12592 8.04063 8.74147 8.04063H5.25801Z" fill="currentColor"/></svg>';
+    // Reuse the two-column "portal preview on the right" card (pi-card) so the
+    // gate shows what the client portal looks like while pointing to the CRM.
+    var co = hashParam('company') || 'Studio';
+    var coShort = co.trim().split(/\s+/)[0];
+    var initial = (co.trim()[0] || 'S').toUpperCase();
+    var t = PI_THEME[hashParam('theme')] || PI_THEME.brand;
+    var HOME = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>';
+    var MSG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+    var FILES = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
+    var lines = '<div class="pi-line"></div><div class="pi-line short"></div><div class="pi-head2"></div><div class="pi-line"></div><div class="pi-line"></div><div class="pi-line short"></div><div class="pi-line"></div><div class="pi-line short"></div>';
     ov = document.createElement('div');
     ov.className = 'cf-ov';
-    ov.innerHTML = '<div class="cf-card">' +
-      '<div class="cf-ic">' + CRM_IC + '</div>' +
-      '<h2 class="cf-title">Meet your test client first</h2>' +
-      '<p class="cf-copy">To preview the client portal, head to your CRM and open it as your test client — we’ll walk you through it from there.</p>' +
-      '<div class="cf-actions"><button class="cf-cancel" type="button">Not now</button><button class="cf-go" type="button">Go to CRM</button></div>' +
+    ov.style.setProperty('--pi-side', t[0]);
+    ov.style.setProperty('--pi-tx', t[1]);
+    ov.innerHTML = '<div class="pi-card">' +
+      '<div class="pi-left">' +
+        '<h2 class="pi-title">First, see your client’s view</h2>' +
+        '<p class="pi-copy">We’ve added a test client to your CRM so you can preview your portal. Open it as them to see exactly what your clients see — we’ll guide you.</p>' +
+        '<div class="cf-actions" style="margin-top:auto;"><button class="cf-cancel" type="button">Not now</button><button class="cf-go" type="button">Go to CRM</button></div>' +
+      '</div>' +
+      '<div class="pi-right"><div class="pi-portal">' +
+        '<div class="pi-side">' +
+          '<div class="pi-ws"><span class="pi-av">' + initial + '</span><span>' + coShort + '</span></div>' +
+          '<div class="pi-nav"><span class="pi-item active">' + HOME + 'Home</span><span class="pi-item">' + MSG + 'Messages</span><span class="pi-item">' + FILES + 'Files</span></div>' +
+          '<div class="pi-client"><span class="pi-cav">TC</span><span class="pi-cname"><span>Viewing as</span><b>Test Client</b></span></div>' +
+        '</div>' +
+        '<div class="pi-main"><div class="pi-greet">Good morning</div><div class="pi-sub"></div><div class="pi-hero"></div>' + lines + '</div>' +
+      '</div></div>' +
     '</div>';
     document.body.appendChild(ov);
     function close() { ov.classList.remove('show'); }
