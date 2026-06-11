@@ -239,6 +239,21 @@
     const exitEl = document.getElementById('exitPreview');
     exitEl.setAttribute('href', (fromPage || 'studio.html') + (navParams.length ? '#' + navParams.join('&') : ''));
 
+    // Once the studio owner has PUBLISHED an app, it's live for clients — so it
+    // shows in the client portal nav (after Messages).
+    (function () {
+      var app = null;
+      try { var l = JSON.parse(localStorage.getItem('onb.buildApps')); if (Array.isArray(l)) app = l.filter(function (a) { return a && a.name && a.status === 'published'; }).pop(); } catch (e) {}
+      var nav = document.querySelector('.side-nav');
+      if (!app || !nav) return;
+      var CLOCK = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>';
+      var a = document.createElement('a');
+      a.className = 'side-item';
+      a.innerHTML = CLOCK;
+      a.appendChild(document.createTextNode(app.name));
+      nav.appendChild(a);   // after Messages (last item)
+    })();
+
     // ── Branded sign-in preview (arriving with #signin=1) ──
     // Shows how a client's branded sign-in looks; skippable since it's a preview.
     (function () {

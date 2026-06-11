@@ -1400,8 +1400,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       // and, on hover, explain the app is ready to publish.
       '.asm-composer.asm-na .asm-composer-box{position:relative;cursor:default;}' +
       '.asm-composer.asm-na .asm-textarea,.asm-composer.asm-na .asm-composer-bar{pointer-events:none;}' +
-      '.asm-composer.asm-na .asm-composer-box::after{content:attr(data-asm-na);position:absolute;left:12px;top:10px;max-width:calc(100% - 24px);background:#1a1a1a;color:#fff;font-size:11.5px;font-weight:400;line-height:1.4;padding:6px 9px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .12s ease;box-shadow:0 6px 18px rgba(0,0,0,0.2);z-index:40;text-align:left;}' +
-      '.asm-composer.asm-na .asm-composer-box:hover::after{opacity:1;}',
+      '.asm-composer.asm-na-tip .asm-composer-box::after{content:attr(data-asm-na);position:absolute;left:12px;top:10px;max-width:calc(100% - 24px);background:#1a1a1a;color:#fff;font-size:11.5px;font-weight:400;line-height:1.4;padding:6px 9px;border-radius:7px;opacity:0;pointer-events:none;transition:opacity .12s ease;box-shadow:0 6px 18px rgba(0,0,0,0.2);z-index:40;text-align:left;}' +
+      '.asm-composer.asm-na-tip .asm-composer-box:hover::after{opacity:1;}',
       '.asm-attach:hover { background:rgba(16,16,16,0.04); color:#101010; }',
       // Voice button sits to the left of Send. Picks up margin-left:auto so
       // it pushes itself + Send to the right, aligning with the prior Send-only layout.
@@ -5090,20 +5090,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         var composerBox = wrap.querySelector('.asm-composer-box');
         if (STATE.phase === 'done' || STATE.phase === 'plan') {
           // Typing isn't part of this prototype in these phases — lock the composer
-          // (a hover tooltip explains). The Approve callout above still works, so
-          // plan-phase users approve to build; done-phase users publish.
+          // (asm-na). The hover tooltip (asm-na-tip) is shown separately, and in the
+          // plan phase ONLY once the Approve callout is actually visible.
           ta.disabled = true;
           wrap.classList.add('disabled', 'asm-na');
           if (STATE.phase === 'done') {
             ta.placeholder = 'How might you improve your app?';
+            wrap.classList.add('asm-na-tip');
             if (composerBox) composerBox.setAttribute('data-asm-na', 'Not part of this prototype');
           } else {
             ta.placeholder = 'Type to revise the plan';
-            if (composerBox) composerBox.setAttribute('data-asm-na', 'Not part of this prototype — approve the plan above to build it.');
+            var callout = shell.querySelector('.asm-plan-callout-v5');
+            var approveVis = !!callout && getComputedStyle(callout).visibility !== 'hidden' && parseFloat(getComputedStyle(callout).opacity || '1') > 0.05;
+            if (approveVis) {
+              wrap.classList.add('asm-na-tip');
+              if (composerBox) composerBox.setAttribute('data-asm-na', 'Not part of this prototype — approve the plan above to build it.');
+            } else {
+              wrap.classList.remove('asm-na-tip');
+              if (composerBox) composerBox.removeAttribute('data-asm-na');
+            }
           }
         } else if (v4PausedBuild) {
           // Build paused: keep the composer active so Resume/Stop stays usable.
-          wrap.classList.remove('asm-na');
+          wrap.classList.remove('asm-na', 'asm-na-tip');
           if (composerBox) composerBox.removeAttribute('data-asm-na');
           if (ta.disabled) {
             ta.disabled = false;
@@ -5111,7 +5120,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           }
           ta.placeholder = 'Paused — type to revise the plan…';
         } else {
-          wrap.classList.remove('asm-na');
+          wrap.classList.remove('asm-na', 'asm-na-tip');
           if (composerBox) composerBox.removeAttribute('data-asm-na');
           if (!ta.disabled) {
             ta.disabled = true;
