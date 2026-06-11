@@ -184,8 +184,7 @@
       wrap.className = 'notif-wrap';
       wrap.innerHTML =
         '<div class="notif-list">' +
-          '<div class="notif-row selected" id="notifApp">' +
-            '<span class="notif-ic">' + CHECK + '</span>' +
+          '<div class="notif-row selected" id="notifApp" data-live="1">' +
             '<div class="notif-body"><div class="notif-title"></div><div class="notif-sub">Finished building</div></div>' +
             '<div class="notif-meta"><span class="notif-time">Just now</span><span class="notif-dot"></span></div>' +
           '</div>' +
@@ -194,7 +193,7 @@
           '<div class="notif-detail-ic">' + CHECK + '</div>' +
           '<h2 class="notif-detail-title"></h2>' +
           '<p class="notif-detail-sub">Open the builder to review it and publish it to your client portal.</p>' +
-          '<button class="btn-dark" id="notifPublish" type="button">Open builder to publish</button>' +
+          '<button class="btn-dark" id="notifPublish" type="button" data-live="1">Open builder to publish</button>' +
         '</div>';
       main.appendChild(wrap);
       var ready = 'Your ' + app.name + ' app is built and ready to publish';
